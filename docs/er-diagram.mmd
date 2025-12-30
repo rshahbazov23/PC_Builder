@@ -1,0 +1,147 @@
+%% Entity-Relationship Diagram for PC Builder Store
+%% COMP306 Database Management Systems Project
+%% Copy this into https://mermaid.live/ or similar tool to visualize
+
+erDiagram
+    User ||--o{ Build : creates
+    User ||--o{ Orders : places
+    Build ||--o{ BuildItem : contains
+    BuildItem }o--|| Product : references
+    Orders ||--o{ OrderItem : contains
+    OrderItem }o--|| Product : references
+    Category ||--o{ Product : has
+    Product ||--o| CPU_Spec : has
+    Product ||--o| MOBO_Spec : has
+    Product ||--o| GPU_Spec : has
+    Product ||--o| RAM_Spec : has
+    Product ||--o| PSU_Spec : has
+    Product ||--o| CASE_Spec : has
+    Product ||--o| Storage_Spec : has
+
+    User {
+        int user_id PK
+        varchar username UK
+        varchar email UK
+        timestamp created_at
+    }
+
+    Category {
+        int category_id PK
+        varchar name UK
+        varchar slug UK
+        text description
+        varchar icon
+    }
+
+    Product {
+        int product_id PK
+        int category_id FK
+        varchar name
+        varchar brand
+        varchar model
+        decimal price
+        int stock_qty
+        int power_watts
+        decimal rating
+        varchar image_url
+        text description
+        timestamp created_at
+    }
+
+    Build {
+        int build_id PK
+        int user_id FK
+        varchar name
+        text description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    BuildItem {
+        int build_item_id PK
+        int build_id FK
+        int product_id FK
+        enum slot_type
+        timestamp added_at
+    }
+
+    CPU_Spec {
+        int product_id PK-FK
+        varchar socket
+        int core_count
+        int thread_count
+        decimal base_clock_ghz
+        decimal boost_clock_ghz
+        int tdp_watts
+    }
+
+    MOBO_Spec {
+        int product_id PK-FK
+        varchar socket
+        varchar form_factor
+        varchar ram_type
+        int ram_slots
+        int max_ram_gb
+        varchar pcie_version
+    }
+
+    GPU_Spec {
+        int product_id PK-FK
+        int length_mm
+        int vram_gb
+        int min_psu_watts
+        varchar pcie_version
+    }
+
+    RAM_Spec {
+        int product_id PK-FK
+        varchar ram_type
+        int speed_mhz
+        int size_gb
+        int modules
+        varchar latency
+    }
+
+    PSU_Spec {
+        int product_id PK-FK
+        int wattage
+        varchar efficiency_rating
+        varchar modular
+        int psu_length_mm
+    }
+
+    CASE_Spec {
+        int product_id PK-FK
+        int max_gpu_length_mm
+        varchar supported_form_factor
+        int max_psu_length_mm
+        int drive_bays_25
+        int drive_bays_35
+    }
+
+    Storage_Spec {
+        int product_id PK-FK
+        varchar storage_type
+        int capacity_gb
+        varchar form_factor
+        int read_speed_mbps
+        int write_speed_mbps
+    }
+
+    Orders {
+        int order_id PK
+        int user_id FK
+        decimal total_price
+        enum status
+        text shipping_address
+        timestamp created_at
+    }
+
+    OrderItem {
+        int order_item_id PK
+        int order_id FK
+        int product_id FK
+        int quantity
+        decimal unit_price
+    }
+

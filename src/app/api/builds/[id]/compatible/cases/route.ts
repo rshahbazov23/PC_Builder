@@ -62,9 +62,9 @@ export async function GET(
       ORDER BY p.rating DESC, p.price ASC
     `;
 
-    const cases = await query<CompatibleCase>(sql, [buildId, buildId, buildId]);
+    const cases = await query<CompatibleCase[]>(sql, [buildId, buildId, buildId]);
 
-    const gpuInfo = await query<{ length_mm: number; name: string }>(
+    const gpuInfo = await query<{ length_mm: number; name: string }[]>(
       `SELECT g.length_mm, p.name
        FROM BuildItem bi
        JOIN GPU_Spec g ON g.product_id = bi.product_id
@@ -73,7 +73,7 @@ export async function GET(
       [buildId]
     );
 
-    const moboInfo = await query<{ form_factor: string; name: string }>(
+    const moboInfo = await query<{ form_factor: string; name: string }[]>(
       `SELECT m.form_factor, p.name
        FROM BuildItem bi
        JOIN MOBO_Spec m ON m.product_id = bi.product_id

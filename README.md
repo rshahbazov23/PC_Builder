@@ -20,8 +20,8 @@ A "mini-Newegg" PC parts store and PC Builder application built for COMP306 Data
 
 - **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
 - **Backend**: Next.js API Routes
-- **Database**: MySQL 8.x
-- **ORM**: mysql2/promise (raw SQL with prepared statements)
+- **Database**: PostgreSQL 14+
+- **Driver**: pg (raw SQL with parameterized queries)
 
 ## Project Structure
 
@@ -52,8 +52,8 @@ A "mini-Newegg" PC parts store and PC Builder application built for COMP306 Data
 ### Prerequisites
 
 - Node.js 18+ installed
-- MySQL 8.x installed and running
-- A MySQL user with database creation privileges
+- PostgreSQL 14+ installed and running
+- A PostgreSQL user with database creation privileges
 
 ### 1. Clone and Install Dependencies
 
@@ -64,7 +64,7 @@ npm install
 
 ### 2. Configure Environment Variables
 
-Copy the example environment file and edit it with your MySQL credentials:
+Copy the example environment file and edit it with your PostgreSQL credentials:
 
 ```bash
 cp env.example .env.local
@@ -72,25 +72,26 @@ cp env.example .env.local
 
 Edit `.env.local`:
 ```
-MYSQL_HOST=localhost
-MYSQL_USER=root
-MYSQL_PASSWORD=your_password
-MYSQL_DATABASE=pc_builder
-MYSQL_PORT=3306
+PGHOST=localhost
+PGUSER=postgres
+PGPASSWORD=your_password
+PGDATABASE=pc_builder
+PGPORT=5432
 ```
 
 ### 3. Set Up the Database
 
-Run the schema and seed files in MySQL:
+Run the schema and seed files in PostgreSQL:
 
 ```bash
-# Option 1: Using mysql CLI
-mysql -u root -p < db/schema.sql
-mysql -u root -p pc_builder < db/seed.sql
+psql -U postgres -f db/schema.sql
+psql -U postgres -d pc_builder -f db/seed.sql
+```
 
-# Option 2: Using MySQL Workbench
-# 1. Open schema.sql and execute
-# 2. Open seed.sql and execute
+Or use the npm script:
+
+```bash
+npm run db:setup
 ```
 
 ### 4. Start the Development Server
@@ -188,4 +189,3 @@ The seed file includes:
 ## License
 
 This project was created for educational purposes as part of COMP306 course at Koç University.
-

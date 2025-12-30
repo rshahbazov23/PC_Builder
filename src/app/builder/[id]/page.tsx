@@ -282,10 +282,10 @@ export default function BuildPage() {
                   {compatibleType === 'psu' && './recommended_psu'}
                 </h2>
                 <p className="text-sm text-muted-foreground font-mono">
-                  {compatibleInfo.cpu_socket && `socket: ${compatibleInfo.cpu_socket}`}
-                  {compatibleInfo.mobo_ram_type && `type: ${compatibleInfo.mobo_ram_type}`}
-                  {compatibleInfo.gpu_length_mm && `gpu: ${compatibleInfo.gpu_length_mm}mm`}
-                  {compatibleInfo.recommended_min_watts && `min: ${compatibleInfo.recommended_min_watts}W`}
+                  {compatibleInfo.cpu_socket ? `socket: ${String(compatibleInfo.cpu_socket)}` : null}
+                  {compatibleInfo.mobo_ram_type ? `type: ${String(compatibleInfo.mobo_ram_type)}` : null}
+                  {compatibleInfo.gpu_length_mm ? `gpu: ${String(compatibleInfo.gpu_length_mm)}mm` : null}
+                  {compatibleInfo.recommended_min_watts ? `min: ${String(compatibleInfo.recommended_min_watts)}W` : null}
                 </p>
               </div>
               <Button

@@ -6,7 +6,7 @@ const DEMO_USER_ID = 1;
 
 export async function GET() {
   try {
-    const builds = await query<Build>(
+    const builds = await query<Build[]>(
       `SELECT b.*, 
               COUNT(bi.product_id) AS part_count,
               COALESCE(SUM(p.price), 0) AS total_price,
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       [DEMO_USER_ID, name, description || null]
     );
 
-    const newBuild = await query<Build>(
+    const newBuild = await query<Build[]>(
       'SELECT * FROM Build WHERE build_id = $1',
       [result.insertId]
     );

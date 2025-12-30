@@ -138,7 +138,16 @@ export interface BuildSummary {
 }
 
 export interface BuildItemWithProduct extends BuildItem {
-  product: Product;
+  name: string;
+  brand: string;
+  model: string | null;
+  price: number;
+  stock_qty: number;
+  power_watts: number;
+  rating: number;
+  image_url: string | null;
+  category_name?: string;
+  category_slug?: string;
   specs?: CPUSpec | MOBOSpec | GPUSpec | CASESpec | PSUSpec | RAMSpec | StorageSpec;
 }
 

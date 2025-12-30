@@ -1,8 +1,3 @@
-/**
- * GET /api/products
- * Returns products with optional filters (category, brand, price range, stock)
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { Product } from '@/lib/types';
@@ -17,7 +12,6 @@ export async function GET(request: NextRequest) {
     const inStock = searchParams.get('inStock');
     const limit = searchParams.get('limit');
 
-    // Build dynamic query with filters
     let sql = `
       SELECT p.*, c.name AS category_name, c.slug AS category_slug
       FROM Product p
@@ -25,24 +19,25 @@ export async function GET(request: NextRequest) {
       WHERE 1=1
     `;
     const params: (string | number)[] = [];
+    let paramIndex = 1;
 
     if (category) {
-      sql += ' AND c.slug = ?';
+      sql += ` AND c.slug = $${paramIndex++}`;
       params.push(category);
     }
 
     if (brand) {
-      sql += ' AND p.brand = ?';
+      sql += ` AND p.brand = $${paramIndex++}`;
       params.push(brand);
     }
 
     if (minPrice) {
-      sql += ' AND p.price >= ?';
+      sql += ` AND p.price >= $${paramIndex++}`;
       params.push(parseFloat(minPrice));
     }
 
     if (maxPrice) {
-      sql += ' AND p.price <= ?';
+      sql += ` AND p.price <= $${paramIndex++}`;
       params.push(parseFloat(maxPrice));
     }
 
@@ -53,7 +48,7 @@ export async function GET(request: NextRequest) {
     sql += ' ORDER BY p.rating DESC, p.name';
 
     if (limit) {
-      sql += ' LIMIT ?';
+      sql += ` LIMIT $${paramIndex++}`;
       params.push(parseInt(limit));
     }
 
@@ -67,5 +62,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-

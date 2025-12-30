@@ -1,21 +1,3 @@
-/**
- * GET /api/top-brands
- * 
- * ADVANCED SQL QUERY #5: Top Brands (GROUP BY + HAVING)
- * 
- * This query identifies the top brands in each category based on:
- * - Having at least N products (variety)
- * - Having an average rating above a threshold (quality)
- * 
- * Uses:
- * - GROUP BY with multiple columns
- * - HAVING clause with multiple conditions
- * - COUNT and AVG aggregate functions
- * - Filtering on aggregated values
- * 
- * This is a classic "find groups meeting criteria" pattern.
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
@@ -38,25 +20,14 @@ export async function GET(request: NextRequest) {
     const minRating = searchParams.get('minRating') || '4.0';
     const category = searchParams.get('category');
 
-    /**
-     * ADVANCED QUERY #5: Top Brands per Category
-     * 
-     * Uses GROUP BY to aggregate products by category and brand,
-     * then HAVING to filter groups that meet our quality criteria:
-     * - Minimum number of products (brand has variety)
-     * - Minimum average rating (brand has quality)
-     * 
-     * Returns detailed statistics for each qualifying brand.
-     */
     let sql = `
       SELECT 
         c.name AS category_name,
         c.slug AS category_slug,
         p.brand,
-        /* Aggregate functions over the group */
         COUNT(*) AS num_products,
-        ROUND(AVG(p.rating), 2) AS avg_rating,
-        ROUND(AVG(p.price), 2) AS avg_price,
+        ROUND(AVG(p.rating)::numeric, 2) AS avg_rating,
+        ROUND(AVG(p.price)::numeric, 2) AS avg_price,
         MIN(p.price) AS min_price,
         MAX(p.price) AS max_price,
         SUM(p.stock_qty) AS total_stock
@@ -66,22 +37,18 @@ export async function GET(request: NextRequest) {
     `;
 
     const params: (string | number)[] = [];
+    let paramIndex = 1;
 
     if (category) {
-      sql += ' AND c.slug = ?';
+      sql += ` AND c.slug = $${paramIndex++}`;
       params.push(category);
     }
 
     sql += `
-      /* GROUP BY category and brand to aggregate per brand per category */
       GROUP BY c.category_id, c.name, c.slug, p.brand
-      
-      /* HAVING filters groups after aggregation */
-      /* Only include brands with enough products AND good ratings */
       HAVING 
-        COUNT(*) >= ? 
-        AND AVG(p.rating) >= ?
-      
+        COUNT(*) >= $${paramIndex++} 
+        AND AVG(p.rating) >= $${paramIndex++}
       ORDER BY 
         c.name ASC,
         avg_rating DESC,
@@ -93,7 +60,6 @@ export async function GET(request: NextRequest) {
 
     const topBrands = await query<TopBrand[]>(sql, params);
 
-    // Group by category for easier frontend consumption
     const byCategory: Record<string, TopBrand[]> = {};
     for (const brand of topBrands) {
       if (!byCategory[brand.category_name]) {
@@ -121,5 +87,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-

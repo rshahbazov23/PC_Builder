@@ -37,9 +37,9 @@ export async function GET(
       ORDER BY r.speed_mhz DESC, p.rating DESC, p.price ASC
     `;
 
-    const ram = await query<CompatibleRAM>(sql, [buildId]);
+    const ram = await query<CompatibleRAM[]>(sql, [buildId]);
 
-    const moboInfo = await query<{ ram_type: string; name: string; max_ram_gb: number }>(
+    const moboInfo = await query<{ ram_type: string; name: string; max_ram_gb: number }[]>(
       `SELECT m.ram_type, p.name, m.max_ram_gb
        FROM BuildItem bi
        JOIN MOBO_Spec m ON m.product_id = bi.product_id

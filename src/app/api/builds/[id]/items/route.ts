@@ -53,7 +53,7 @@ export async function POST(
       );
     }
 
-    const existingItem = await query<{ build_item_id: number }>(
+    const existingItem = await query<{ build_item_id: number }[]>(
       'SELECT build_item_id FROM BuildItem WHERE build_id = $1 AND slot_type = $2',
       [buildId, slot_type]
     );

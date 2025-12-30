@@ -36,9 +36,9 @@ export async function GET(
       ORDER BY p.rating DESC, p.price ASC
     `;
 
-    const motherboards = await query<CompatibleMotherboard>(sql, [buildId]);
+    const motherboards = await query<CompatibleMotherboard[]>(sql, [buildId]);
 
-    const cpuSocket = await query<{ socket: string }>(
+    const cpuSocket = await query<{ socket: string }[]>(
       `SELECT cpu_spec.socket
        FROM BuildItem bi
        JOIN CPU_Spec cpu_spec ON cpu_spec.product_id = bi.product_id

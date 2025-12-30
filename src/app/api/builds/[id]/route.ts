@@ -21,7 +21,7 @@ export async function GET(
       );
     }
 
-    const items = await query<BuildItemWithProduct>(
+    const items = await query<BuildItemWithProduct[]>(
       `SELECT bi.*, 
               p.product_id, p.name, p.brand, p.model, p.price, 
               p.stock_qty, p.power_watts, p.rating, p.image_url,

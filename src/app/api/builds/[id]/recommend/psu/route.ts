@@ -46,9 +46,9 @@ export async function GET(
         p.price ASC
     `;
 
-    const psus = await query<RecommendedPSU>(sql, [buildId, buildId]);
+    const psus = await query<RecommendedPSU[]>(sql, [buildId, buildId]);
 
-    const powerInfo = await query<{ total_watts: number; part_count: number }>(
+    const powerInfo = await query<{ total_watts: number; part_count: number }[]>(
       `SELECT 
         COALESCE(SUM(p.power_watts), 0) AS total_watts,
         COUNT(*) AS part_count

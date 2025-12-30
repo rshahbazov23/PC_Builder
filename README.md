@@ -72,11 +72,7 @@ cp env.example .env.local
 
 Edit `.env.local`:
 ```
-PGHOST=localhost
-PGUSER=postgres
-PGPASSWORD=your_password
-PGDATABASE=pc_builder
-PGPORT=5432
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/pc_builder
 ```
 
 ### 3. Set Up the Database

@@ -76,7 +76,7 @@ export default function BuilderPage() {
         <div className="max-w-4xl mx-auto px-4 py-16 text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">PC Builder</h1>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Select your components and we'll check compatibility automatically. 
+            Select your components and we&apos;ll check compatibility automatically. 
             CPU sockets, RAM types, GPU clearance — all handled.
           </p>
           <Button 

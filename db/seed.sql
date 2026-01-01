@@ -440,3 +440,81 @@ INSERT INTO BuildItem (build_id, product_id, slot_type) VALUES
 (1, 124, 'PSU'),
 (1, 100, 'CASE'),
 (1, 151, 'STORAGE');
+
+-- Sample orders (optional tables, but populated for meaningful query outputs)
+-- Insert orders and their line items using CTEs so we don't rely on hard-coded order_id values.
+
+WITH items(product_id, quantity, unit_price) AS (
+  VALUES
+    (14, 1, 399.99),  -- AMD Ryzen 7 7800X3D
+    (39, 1, 299.99),  -- MSI MAG X670E Tomahawk WiFi
+    (54, 1, 999.99),  -- NVIDIA GeForce RTX 4080 Super
+    (79, 1, 169.99),  -- G.Skill Trident Z5 RGB DDR5-6000 32GB
+    (124, 1, 139.99), -- Corsair RM850x
+    (100, 1, 169.99), -- Lian Li O11 Dynamic EVO
+    (151, 1, 179.99)  -- Samsung 990 Pro 2TB
+),
+new_order AS (
+  INSERT INTO Orders (user_id, total_price, status, shipping_address)
+  SELECT
+    1,
+    ROUND(SUM(quantity * unit_price)::numeric, 2) AS total_price,
+    'delivered'::order_status_enum,
+    'Koc University, Sariyer, Istanbul 34450, Turkey' AS shipping_address
+  FROM items
+  RETURNING order_id
+)
+INSERT INTO OrderItem (order_id, product_id, quantity, unit_price)
+SELECT new_order.order_id, items.product_id, items.quantity, items.unit_price
+FROM new_order
+CROSS JOIN items;
+
+WITH items(product_id, quantity, unit_price) AS (
+  VALUES
+    (23, 1, 129.99), -- AMD Ryzen 5 5600X
+    (47, 1, 149.99), -- ASUS TUF Gaming B550-Plus
+    (76, 1, 269.99), -- AMD Radeon RX 7600
+    (98, 1, 49.99),  -- G.Skill Ripjaws V DDR4-3600 16GB
+    (146, 1, 59.99), -- Corsair CV650
+    (115, 1, 99.99), -- Fractal Design Meshify C Mini
+    (154, 1, 89.99)  -- Samsung 980 Pro 1TB
+),
+new_order AS (
+  INSERT INTO Orders (user_id, total_price, status, shipping_address)
+  SELECT
+    1,
+    ROUND(SUM(quantity * unit_price)::numeric, 2) AS total_price,
+    'shipped'::order_status_enum,
+    'Koc University, Sariyer, Istanbul 34450, Turkey' AS shipping_address
+  FROM items
+  RETURNING order_id
+)
+INSERT INTO OrderItem (order_id, product_id, quantity, unit_price)
+SELECT new_order.order_id, items.product_id, items.quantity, items.unit_price
+FROM new_order
+CROSS JOIN items;
+
+WITH items(product_id, quantity, unit_price) AS (
+  VALUES
+    (12, 1, 649.99),  -- AMD Ryzen 9 7950X3D
+    (35, 1, 699.99),  -- ASUS ROG Crosshair X670E Hero
+    (51, 1, 1599.99), -- NVIDIA GeForce RTX 4090 Founders Edition
+    (87, 1, 329.99),  -- G.Skill Trident Z5 RGB DDR5-6000 64GB
+    (137, 1, 399.99), -- Corsair HX1500i
+    (106, 1, 189.99), -- Fractal Design Torrent
+    (159, 1, 299.99)  -- Crucial T700 2TB
+),
+new_order AS (
+  INSERT INTO Orders (user_id, total_price, status, shipping_address)
+  SELECT
+    2,
+    ROUND(SUM(quantity * unit_price)::numeric, 2) AS total_price,
+    'processing'::order_status_enum,
+    'Koc University, Sariyer, Istanbul 34450, Turkey' AS shipping_address
+  FROM items
+  RETURNING order_id
+)
+INSERT INTO OrderItem (order_id, product_id, quantity, unit_price)
+SELECT new_order.order_id, items.product_id, items.quantity, items.unit_price
+FROM new_order
+CROSS JOIN items;

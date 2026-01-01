@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS pc_builder;
-CREATE DATABASE pc_builder;
-\c pc_builder;
+DROP DATABASE IF EXISTS neondb;
+CREATE DATABASE neondb;
+\c neondb;
 
 DROP TABLE IF EXISTS BuildItem CASCADE;
 DROP TABLE IF EXISTS OrderItem CASCADE;

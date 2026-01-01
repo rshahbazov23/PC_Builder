@@ -153,7 +153,7 @@ export default async function HomePage() {
               href="/deals"
               className="flex-shrink-0 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-muted transition-colors whitespace-nowrap"
             >
-              Today's Deals
+              Today&apos;s Deals
             </Link>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default async function HomePage() {
 
           {/* Deals Card */}
           <div className="bg-background border border-border p-5">
-            <h2 className="font-bold text-lg mb-4">Today's Deals</h2>
+            <h2 className="font-bold text-lg mb-4">Today&apos;s Deals</h2>
             <div className="grid grid-cols-2 gap-2">
               {deals.slice(0, 4).map((p) => (
                 <Link key={p.product_id} href={`/product/${p.product_id}`} className="group">
@@ -219,7 +219,7 @@ export default async function HomePage() {
         {deals.length > 0 && (
           <section className="bg-background border border-border p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-lg">Today's Deals</h2>
+              <h2 className="font-bold text-lg">Today&apos;s Deals</h2>
               <Link href="/deals" className="text-sm text-blue-600 hover:underline">
                 See all
               </Link>

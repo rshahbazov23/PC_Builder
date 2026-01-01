@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { BuildSlot } from '@/components/BuildSlot';
@@ -43,11 +43,7 @@ export default function BuildPage() {
   const [compatibleLoading, setCompatibleLoading] = useState(false);
   const [compatibleInfo, setCompatibleInfo] = useState<Record<string, unknown>>({});
 
-  useEffect(() => {
-    fetchBuild();
-  }, [buildId]);
-
-  const fetchBuild = async () => {
+  const fetchBuild = useCallback(async () => {
     try {
       const res = await fetch(`/api/builds/${buildId}`);
       if (!res.ok) throw new Error('Build not found');
@@ -59,7 +55,11 @@ export default function BuildPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [buildId, router]);
+
+  useEffect(() => {
+    fetchBuild();
+  }, [fetchBuild]);
 
   const removeItem = async (slotType: SlotType) => {
     try {

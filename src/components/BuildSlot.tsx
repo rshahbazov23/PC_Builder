@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SlotType, Product } from '@/lib/types';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
@@ -47,11 +47,25 @@ export function BuildSlot({ slotType, product, onRemove, onSelectCompatible, onS
 
   const categorySlug = slotToCategory[slotType];
 
+  const fetchProducts = useCallback(async () => {
+    setLoadingProducts(true);
+    try {
+      const res = await fetch(`/api/products?category=${categorySlug}&inStock=true`);
+      const data = await res.json();
+      setProducts(data);
+      setFilteredProducts(data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoadingProducts(false);
+    }
+  }, [categorySlug]);
+
   useEffect(() => {
     if (expanded && products.length === 0) {
       fetchProducts();
     }
-  }, [expanded]);
+  }, [expanded, products.length, fetchProducts]);
 
   useEffect(() => {
     if (search) {
@@ -64,20 +78,6 @@ export function BuildSlot({ slotType, product, onRemove, onSelectCompatible, onS
       setFilteredProducts(products);
     }
   }, [products, search]);
-
-  const fetchProducts = async () => {
-    setLoadingProducts(true);
-    try {
-      const res = await fetch(`/api/products?category=${categorySlug}&inStock=true`);
-      const data = await res.json();
-      setProducts(data);
-      setFilteredProducts(data);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoadingProducts(false);
-    }
-  };
 
   const handleSelect = (p: Product) => {
     if (onSelectProduct) {

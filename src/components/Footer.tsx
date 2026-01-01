@@ -18,7 +18,7 @@ export function Footer() {
               and curated deals.
             </p>
             <div className="mt-4 text-xs text-muted-foreground/60">
-              // COMP306 Database Management Systems
+              {'// COMP306 Database Management Systems'}
             </div>
           </div>
 
@@ -56,7 +56,7 @@ export function Footer() {
             © {new Date().getFullYear()} ku_build
           </p>
           <p className="text-xs text-muted-foreground font-mono">
-            v1.0.0 // made with next.js + mysql
+            {'v1.0.0 // made with next.js + postgresql'}
           </p>
         </div>
       </div>

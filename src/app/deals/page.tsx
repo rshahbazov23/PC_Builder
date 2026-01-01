@@ -54,7 +54,7 @@ export default async function DealsPage() {
           </nav>
           <h1 className="text-3xl font-semibold mb-2">./deals</h1>
           <p className="text-muted-foreground font-mono text-sm">
-            // products priced below category average
+            {'// products priced below category average'}
           </p>
           <div className="mt-4 p-3 bg-muted text-sm font-mono">
             <span className="text-muted-foreground">query:</span> correlated subquery with AVG aggregate

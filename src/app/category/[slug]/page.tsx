@@ -89,7 +89,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           </nav>
           <h1 className="text-3xl font-semibold">{category.name}</h1>
           <p className="text-muted-foreground mt-2 font-mono text-sm">
-            // {category.description}
+            {category.description ? `// ${category.description}` : null}
           </p>
         </div>
       </div>

@@ -60,7 +60,7 @@ export default async function TopBrandsPage() {
           </nav>
           <h1 className="text-3xl font-semibold mb-2">./top_brands</h1>
           <p className="text-muted-foreground font-mono text-sm">
-            // brands with 3+ products and 4.0+ rating
+            {'// brands with 3+ products and 4.0+ rating'}
           </p>
           <div className="mt-4 p-3 bg-muted text-sm font-mono">
             <span className="text-muted-foreground">query:</span> GROUP BY + HAVING with COUNT/AVG filters
@@ -115,7 +115,7 @@ export default async function TopBrandsPage() {
                 >
                   {index === 0 && (
                     <div className="text-xs font-mono text-muted-foreground mb-3">
-                      // top rated
+                      {'// top rated'}
                     </div>
                   )}
                   

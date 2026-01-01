@@ -72,7 +72,7 @@ cp env.example .env.local
 
 Edit `.env.local`:
 ```
-DATABASE_URL=postgresql://postgres:your_password@localhost:5432/pc_builder
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/neondb
 ```
 
 ### 3. Set Up the Database
@@ -81,7 +81,7 @@ Run the schema and seed files in PostgreSQL:
 
 ```bash
 psql -U postgres -f db/schema.sql
-psql -U postgres -d pc_builder -f db/seed.sql
+psql -U postgres -d neondb -f db/seed.sql
 ```
 
 Or use the npm script:
@@ -100,7 +100,7 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Database Schema
 
-### Tables (12 total)
+### Tables (14 total; 12 core + 2 order tables)
 
 1. **Category** - Product categories
 2. **User** - User accounts
@@ -114,8 +114,8 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 10. **PSU_Spec** - Power supply specifications
 11. **CASE_Spec** - Case specifications
 12. **Storage_Spec** - SSD/HDD specifications
-13. **Orders** - Customer orders (optional)
-14. **OrderItem** - Order line items (optional)
+13. **Orders** - Customer orders
+14. **OrderItem** - Order line items
 
 ### Key Relationships
 
@@ -172,7 +172,8 @@ The seed file includes:
 - 28+ PSUs (550W to 1500W)
 - 23+ Cases (ATX, Micro-ATX, Mini-ITX)
 - 32+ Storage devices (NVMe, SATA SSD, HDD)
-- 1 demo build
+- 3 demo builds
+- 3 demo orders (21 order items)
 
 ## For the Report
 

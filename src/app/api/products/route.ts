@@ -7,10 +7,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const brand = searchParams.get('brand');
+    const q = searchParams.get('q');
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
+    const minRating = searchParams.get('minRating');
     const inStock = searchParams.get('inStock');
-    const limit = searchParams.get('limit');
+    const sort = searchParams.get('sort');
+    const limitRaw = searchParams.get('limit');
+    const offsetRaw = searchParams.get('offset');
 
     let sql = `
       SELECT p.*, c.name AS category_name, c.slug AS category_slug
@@ -31,6 +35,17 @@ export async function GET(request: NextRequest) {
       params.push(brand);
     }
 
+    if (q && q.trim()) {
+      sql += ` AND (
+        p.name ILIKE $${paramIndex}
+        OR p.brand ILIKE $${paramIndex}
+        OR COALESCE(p.model, '') ILIKE $${paramIndex}
+        OR COALESCE(p.description, '') ILIKE $${paramIndex}
+      )`;
+      params.push(`%${q.trim()}%`);
+      paramIndex++;
+    }
+
     if (minPrice) {
       sql += ` AND p.price >= $${paramIndex++}`;
       params.push(parseFloat(minPrice));
@@ -41,16 +56,45 @@ export async function GET(request: NextRequest) {
       params.push(parseFloat(maxPrice));
     }
 
+    if (minRating) {
+      sql += ` AND p.rating >= $${paramIndex++}`;
+      params.push(parseFloat(minRating));
+    }
+
     if (inStock === 'true') {
       sql += ' AND p.stock_qty > 0';
     }
 
-    sql += ' ORDER BY p.rating DESC, p.name';
-
-    if (limit) {
-      sql += ` LIMIT $${paramIndex++}`;
-      params.push(parseInt(limit));
+    // Safe sort mapping (avoid injecting arbitrary ORDER BY)
+    switch (sort) {
+      case 'price_asc':
+        sql += ' ORDER BY p.price ASC, p.rating DESC, p.name ASC';
+        break;
+      case 'price_desc':
+        sql += ' ORDER BY p.price DESC, p.rating DESC, p.name ASC';
+        break;
+      case 'name_asc':
+        sql += ' ORDER BY p.name ASC, p.rating DESC';
+        break;
+      case 'newest':
+        sql += ' ORDER BY p.created_at DESC, p.rating DESC';
+        break;
+      case 'stock_desc':
+        sql += ' ORDER BY p.stock_qty DESC, p.rating DESC, p.name ASC';
+        break;
+      case 'rating_desc':
+      default:
+        sql += ' ORDER BY p.rating DESC, p.name ASC';
+        break;
     }
+
+    const limit = Math.min(Math.max(parseInt(limitRaw || '100', 10) || 100, 1), 200);
+    const offset = Math.max(parseInt(offsetRaw || '0', 10) || 0, 0);
+
+    sql += ` LIMIT $${paramIndex++}`;
+    params.push(limit);
+    sql += ` OFFSET $${paramIndex++}`;
+    params.push(offset);
 
     const products = await query<Product[]>(sql, params);
     return NextResponse.json(products);

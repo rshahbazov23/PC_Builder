@@ -19,7 +19,7 @@ async function getProduct(id: number) {
     SELECT p.*, c.name AS category_name, c.slug AS category_slug
     FROM Product p
     JOIN Category c ON p.category_id = c.category_id
-    WHERE p.product_id = ?
+    WHERE p.product_id = $1
   `, [id]);
 }
 
@@ -37,7 +37,7 @@ async function getSpecs(productId: number, categorySlug: string): Promise<Specs 
   const table = specTables[categorySlug];
   if (!table) return null;
 
-  return queryOne<Specs>(`SELECT * FROM ${table} WHERE product_id = ?`, [productId]);
+  return queryOne<Specs>(`SELECT * FROM ${table} WHERE product_id = $1`, [productId]);
 }
 
 async function getSimilarProducts(categoryId: number, productId: number) {
@@ -45,7 +45,7 @@ async function getSimilarProducts(categoryId: number, productId: number) {
     SELECT p.*, c.slug AS category_slug
     FROM Product p
     JOIN Category c ON p.category_id = c.category_id
-    WHERE p.category_id = ? AND p.product_id != ?
+    WHERE p.category_id = $1 AND p.product_id != $2
     ORDER BY p.rating DESC
     LIMIT 4
   `, [categoryId, productId]);

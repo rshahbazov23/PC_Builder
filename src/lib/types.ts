@@ -155,9 +155,14 @@ export interface BuildItemWithProduct extends BuildItem {
 export interface ProductFilters {
   category?: string;
   brand?: string;
+  q?: string;
   minPrice?: number;
   maxPrice?: number;
+  minRating?: number;
   inStock?: boolean;
+  sort?: 'rating_desc' | 'price_asc' | 'price_desc' | 'name_asc' | 'newest' | 'stock_desc';
+  limit?: number;
+  offset?: number;
 }
 
 export interface TopBrand {

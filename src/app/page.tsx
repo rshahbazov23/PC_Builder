@@ -11,6 +11,7 @@ async function getCategories() {
   try {
     return await query<Category[]>('SELECT * FROM Category ORDER BY name');
   } catch (error) {
+    console.error('Error fetching categories:', error);
     return [];
   }
 }

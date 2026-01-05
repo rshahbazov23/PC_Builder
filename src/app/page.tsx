@@ -89,6 +89,11 @@ const categoryData: Record<string, { icon: string; bg: string }> = {
   storage: { icon: '◉', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
   psu: { icon: '⚡', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
   case: { icon: '▢', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
+  cooler: { icon: '❄', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
+  monitor: { icon: '🖥️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
+  keyboard: { icon: '⌨️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
+  mouse: { icon: '🖱️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
+  headset: { icon: '🎧', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
 };
 
 export default async function HomePage() {

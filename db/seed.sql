@@ -5,7 +5,12 @@ INSERT INTO Category (name, slug, description, icon) VALUES
 ('RAM', 'ram', 'Random Access Memory - Fast temporary storage', 'ram'),
 ('PSU', 'psu', 'Power Supply Units - Reliable power for your system', 'psu'),
 ('Case', 'case', 'Computer Cases - House your components in style', 'case'),
-('Storage', 'storage', 'SSDs and HDDs - Store your data', 'storage');
+('Storage', 'storage', 'SSDs and HDDs - Store your data', 'storage'),
+('CPU Cooler', 'cooler', 'Air and liquid coolers to keep your CPU at safe temps', 'cooler'),
+('Monitor', 'monitor', 'Displays for gaming and productivity', 'monitor'),
+('Keyboard', 'keyboard', 'Mechanical and membrane keyboards', 'keyboard'),
+('Mouse', 'mouse', 'Wired and wireless mice', 'mouse'),
+('Headset', 'headset', 'Audio headsets for gaming and calls', 'headset');
 
 INSERT INTO "User" (username, email) VALUES
 ('demo_user', 'demo@pcbuilder.com'),

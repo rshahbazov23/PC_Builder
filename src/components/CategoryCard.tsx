@@ -15,6 +15,11 @@ const categoryIcons: Record<string, string> = {
   storage: '◉',
   psu: '⚡',
   case: '▢',
+  cooler: '❄',
+  monitor: '🖥️',
+  keyboard: '⌨️',
+  mouse: '🖱️',
+  headset: '🎧',
 };
 
 export function CategoryCard({ category, productCount }: CategoryCardProps) {

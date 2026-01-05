@@ -5,6 +5,8 @@ import { ProductCard } from '@/components/ProductCard';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
+export const dynamic = 'force-dynamic';
+
 interface DealProduct extends Product {
   savings_percentage: number;
   category_avg_price: number;

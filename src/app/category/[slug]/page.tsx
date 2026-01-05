@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 
+// Ensure category pages reflect live DB updates (manual inserts in Neon)
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: { slug: string };
   searchParams: {

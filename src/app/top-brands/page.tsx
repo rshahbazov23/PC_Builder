@@ -5,6 +5,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
+export const dynamic = 'force-dynamic';
+
 interface TopBrand {
   category_name: string;
   category_slug: string;

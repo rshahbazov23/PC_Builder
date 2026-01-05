@@ -22,4 +22,8 @@ ON CONFLICT (slug) DO UPDATE SET
   description = EXCLUDED.description,
   icon = EXCLUDED.icon;
 
+-- Verification (you should see the new rows here immediately)
+SELECT current_database() AS db, COUNT(*)::int AS category_count FROM Category;
+SELECT category_id, slug, name FROM Category ORDER BY category_id;
+
 

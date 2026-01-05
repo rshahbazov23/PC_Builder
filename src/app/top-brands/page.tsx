@@ -23,12 +23,12 @@ async function getTopBrands() {
       c.name AS category_name,
       c.slug AS category_slug,
       p.brand,
-      COUNT(*) AS num_products,
-      ROUND(AVG(p.rating), 2) AS avg_rating,
-      ROUND(AVG(p.price), 2) AS avg_price,
-      MIN(p.price) AS min_price,
-      MAX(p.price) AS max_price,
-      SUM(p.stock_qty) AS total_stock
+      COUNT(*)::int AS num_products,
+      ROUND(AVG(p.rating)::numeric, 2)::float8 AS avg_rating,
+      ROUND(AVG(p.price)::numeric, 2)::float8 AS avg_price,
+      MIN(p.price)::float8 AS min_price,
+      MAX(p.price)::float8 AS max_price,
+      SUM(p.stock_qty)::int AS total_stock
     FROM Product p
     JOIN Category c ON p.category_id = c.category_id
     WHERE p.stock_qty > 0
@@ -87,7 +87,7 @@ export default async function TopBrandsPage() {
           </Card>
           <Card className="p-4">
             <div className="text-2xl font-semibold mb-1">
-              {topBrands.reduce((sum, b) => sum + b.num_products, 0)}
+              {topBrands.reduce((sum, b) => sum + Number(b.num_products), 0)}
             </div>
             <div className="text-xs text-muted-foreground font-mono">total_products</div>
           </Card>

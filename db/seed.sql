@@ -542,6 +542,39 @@ INSERT INTO Product (category_id, name, brand, model, price, stock_qty, power_wa
 (12, 'Beyerdynamic MMX 300 (2nd Generation)', 'beyerdynamic', 'MMX 300 (2nd Gen)', 299.00, 10, 0, 4.6, 'Closed-back gaming headset with studio-grade sound'),
 (12, 'JBL Quantum 910 Wireless', 'JBL', 'Quantum 910 Wireless', 299.95, 10, 0, 4.4, 'Wireless gaming headset with spatial audio support');
 
+-- Out of stock items (3-7 per category)
+INSERT INTO Product (category_id, name, brand, model, price, stock_qty, power_watts, rating, description) VALUES
+-- CPU Coolers (category_id = 8)
+(8, 'Noctua NH-L9i-17xx chromax.black', 'Noctua', 'NH-L9i-17xx chromax.black', 59.95, 0, 0, 4.6, 'Low-profile CPU cooler for small form factor builds'),
+(8, 'be quiet! Pure Rock 2', 'be quiet!', 'Pure Rock 2', 44.90, 0, 0, 4.5, 'Quiet tower CPU cooler designed for entry to mid-range systems'),
+(8, 'DeepCool LS720', 'DeepCool', 'LS720', 139.99, 0, 0, 4.6, '360mm AIO liquid CPU cooler with ARGB fans'),
+(8, 'NZXT Kraken Z73', 'NZXT', 'Kraken Z73', 279.99, 0, 0, 4.5, '360mm AIO liquid CPU cooler with LCD display'),
+(8, 'Corsair iCUE H170i ELITE CAPELLIX XT', 'Corsair', 'H170i ELITE CAPELLIX XT', 299.99, 0, 0, 4.5, '420mm AIO liquid CPU cooler with iCUE support'),
+-- Monitors (category_id = 9)
+(9, 'Alienware AW3423DWF', 'Alienware', 'AW3423DWF', 999.99, 0, 0, 4.6, '34-inch QD-OLED ultrawide gaming monitor'),
+(9, 'BenQ ZOWIE XL2546K', 'BenQ', 'XL2546K', 499.99, 0, 0, 4.5, '24.5-inch esports gaming monitor with high refresh rate'),
+(9, 'ASUS ProArt PA278CV', 'ASUS', 'PA278CV', 329.99, 0, 0, 4.5, '27-inch QHD professional monitor with USB-C'),
+(9, 'Samsung Smart Monitor M8', 'Samsung', 'Smart Monitor M8', 699.99, 0, 0, 4.3, '32-inch smart monitor with streaming apps and USB-C'),
+(9, 'LG OLED evo C2 42-inch', 'LG', 'OLED42C2', 999.99, 0, 0, 4.6, '42-inch OLED display often used as a gaming monitor'),
+-- Keyboards (category_id = 10)
+(10, 'Corsair K100 RGB', 'Corsair', 'K100 RGB', 249.99, 0, 0, 4.4, 'Flagship mechanical gaming keyboard with macro controls and RGB'),
+(10, 'Razer Huntsman Mini', 'Razer', 'Huntsman Mini', 119.99, 0, 0, 4.4, 'Compact 60% optical gaming keyboard'),
+(10, 'SteelSeries Apex 7', 'SteelSeries', 'Apex 7', 149.99, 0, 0, 4.4, 'Mechanical gaming keyboard with OLED smart display'),
+(10, 'Logitech MX Keys', 'Logitech', 'MX Keys', 119.99, 0, 0, 4.5, 'Wireless illuminated keyboard for productivity'),
+(10, 'Logitech G413 SE', 'Logitech G', 'G413 SE', 69.99, 0, 0, 4.3, 'Mechanical gaming keyboard with durable aluminum top case'),
+-- Mice (category_id = 11)
+(11, 'Logitech MX Master 3S', 'Logitech', 'MX Master 3S', 99.99, 0, 0, 4.6, 'Wireless mouse designed for productivity with MagSpeed scrolling'),
+(11, 'Logitech MX Anywhere 3', 'Logitech', 'MX Anywhere 3', 79.99, 0, 0, 4.5, 'Compact wireless mouse for travel and multi-device use'),
+(11, 'Razer Orochi V2', 'Razer', 'Orochi V2', 69.99, 0, 0, 4.4, 'Compact wireless gaming mouse designed for portability'),
+(11, 'Razer Viper Mini', 'Razer', 'Viper Mini', 39.99, 0, 0, 4.5, 'Lightweight wired gaming mouse for small-to-medium hands'),
+(11, 'SteelSeries Rival 3', 'SteelSeries', 'Rival 3', 29.99, 0, 0, 4.3, 'Wired gaming mouse designed for durability and performance'),
+-- Headsets (category_id = 12)
+(12, 'Logitech G Astro A40 TR + MixAmp Pro TR', 'Logitech G', 'A40 TR + MixAmp Pro TR', 249.99, 0, 0, 4.4, 'Wired gaming headset bundle with MixAmp for audio control'),
+(12, 'Sennheiser GAME ONE', 'Sennheiser', 'GAME ONE', 129.95, 0, 0, 4.5, 'Open-back gaming headset with integrated microphone'),
+(12, 'Bose QuietComfort 35 II Gaming Headset', 'Bose', 'QC35 II Gaming', 329.00, 0, 0, 4.4, 'Gaming headset based on QuietComfort headphones with boom mic accessory'),
+(12, 'Razer Kraken Kitty V2', 'Razer', 'Kraken Kitty V2', 99.99, 0, 0, 4.3, 'Wired gaming headset with kitty ear design and RGB lighting'),
+(12, 'Audio-Technica ATH-M50xSTS', 'Audio-Technica', 'ATH-M50xSTS', 199.00, 0, 0, 4.5, 'Studio headphone with integrated streaming microphone');
+
 INSERT INTO Build (user_id, name, description) VALUES
 (1, 'High-End Gaming PC', 'Flagship build for 4K gaming'),
 (1, 'Budget Gaming Build', 'Great 1080p gaming on a budget'),

@@ -37,7 +37,13 @@ FROM (
     ('Thermalright Peerless Assassin 120 SE', 'Thermalright', 'Peerless Assassin 120 SE', 39.90, 50, 0, 4.6, 'Value dual-tower air CPU cooler with dual 120mm fans'),
     ('Scythe Fuma 2 Rev.B', 'Scythe', 'Fuma 2 Rev.B', 64.99, 25, 0, 4.6, 'Dual-tower air CPU cooler optimized for quiet operation'),
     ('EK-Nucleus AIO CR360 Lux D-RGB', 'EK', 'Nucleus AIO CR360 Lux D-RGB', 179.99, 15, 0, 4.6, '360mm AIO liquid CPU cooler with D-RGB lighting'),
-    ('Cooler Master MasterLiquid ML240L V2 RGB', 'Cooler Master', 'MasterLiquid ML240L V2 RGB', 89.99, 30, 0, 4.5, '240mm AIO liquid CPU cooler with RGB lighting')
+    ('Cooler Master MasterLiquid ML240L V2 RGB', 'Cooler Master', 'MasterLiquid ML240L V2 RGB', 89.99, 30, 0, 4.5, '240mm AIO liquid CPU cooler with RGB lighting'),
+    -- out of stock
+    ('Noctua NH-L9i-17xx chromax.black', 'Noctua', 'NH-L9i-17xx chromax.black', 59.95, 0, 0, 4.6, 'Low-profile CPU cooler for small form factor builds'),
+    ('be quiet! Pure Rock 2', 'be quiet!', 'Pure Rock 2', 44.90, 0, 0, 4.5, 'Quiet tower CPU cooler designed for entry to mid-range systems'),
+    ('DeepCool LS720', 'DeepCool', 'LS720', 139.99, 0, 0, 4.6, '360mm AIO liquid CPU cooler with ARGB fans'),
+    ('NZXT Kraken Z73', 'NZXT', 'Kraken Z73', 279.99, 0, 0, 4.5, '360mm AIO liquid CPU cooler with LCD display'),
+    ('Corsair iCUE H170i ELITE CAPELLIX XT', 'Corsair', 'H170i ELITE CAPELLIX XT', 299.99, 0, 0, 4.5, '420mm AIO liquid CPU cooler with iCUE support')
 ) AS v(name, brand, model, price, stock_qty, power_watts, rating, description)
 CROSS JOIN cat;
 
@@ -70,7 +76,13 @@ FROM (
     ('Astro A50 Wireless + Base Station', 'ASTRO', 'A50 Wireless', 299.99, 10, 0, 4.4, 'Wireless gaming headset with base station dock'),
     ('Turtle Beach Stealth 700 Gen 2 MAX', 'Turtle Beach', 'Stealth 700 Gen 2 MAX', 199.99, 15, 0, 4.4, 'Wireless gaming headset with long battery life'),
     ('Beyerdynamic MMX 300 (2nd Generation)', 'beyerdynamic', 'MMX 300 (2nd Gen)', 299.00, 10, 0, 4.6, 'Closed-back gaming headset with studio-grade sound'),
-    ('JBL Quantum 910 Wireless', 'JBL', 'Quantum 910 Wireless', 299.95, 10, 0, 4.4, 'Wireless gaming headset with spatial audio support')
+    ('JBL Quantum 910 Wireless', 'JBL', 'Quantum 910 Wireless', 299.95, 10, 0, 4.4, 'Wireless gaming headset with spatial audio support'),
+    -- out of stock
+    ('Logitech G Astro A40 TR + MixAmp Pro TR', 'Logitech G', 'A40 TR + MixAmp Pro TR', 249.99, 0, 0, 4.4, 'Wired gaming headset bundle with MixAmp for audio control'),
+    ('Sennheiser GAME ONE', 'Sennheiser', 'GAME ONE', 129.95, 0, 0, 4.5, 'Open-back gaming headset with integrated microphone'),
+    ('Bose QuietComfort 35 II Gaming Headset', 'Bose', 'QC35 II Gaming', 329.00, 0, 0, 4.4, 'Gaming headset based on QuietComfort headphones with boom mic accessory'),
+    ('Razer Kraken Kitty V2', 'Razer', 'Kraken Kitty V2', 99.99, 0, 0, 4.3, 'Wired gaming headset with kitty ear design and RGB lighting'),
+    ('Audio-Technica ATH-M50xSTS', 'Audio-Technica', 'ATH-M50xSTS', 199.00, 0, 0, 4.5, 'Studio headphone with integrated streaming microphone')
 ) AS v(name, brand, model, price, stock_qty, power_watts, rating, description)
 CROSS JOIN cat;
 
@@ -103,7 +115,13 @@ FROM (
     ('ASUS ROG Claymore II', 'ASUS', 'ROG Claymore II', 249.99, 10, 0, 4.4, 'Modular wireless mechanical gaming keyboard with detachable numpad'),
     ('HyperX Alloy Origins', 'HyperX', 'Alloy Origins', 109.99, 20, 0, 4.4, 'Compact mechanical gaming keyboard with aluminum body and RGB'),
     ('HyperX Alloy FPS Pro', 'HyperX', 'Alloy FPS Pro', 69.99, 25, 0, 4.3, 'Tenkeyless mechanical gaming keyboard'),
-    ('Wooting 60HE', 'Wooting', '60HE', 174.99, 15, 0, 4.6, '60% analog mechanical keyboard with rapid trigger capability')
+    ('Wooting 60HE', 'Wooting', '60HE', 174.99, 15, 0, 4.6, '60% analog mechanical keyboard with rapid trigger capability'),
+    -- out of stock
+    ('Corsair K100 RGB', 'Corsair', 'K100 RGB', 249.99, 0, 0, 4.4, 'Flagship mechanical gaming keyboard with macro controls and RGB'),
+    ('Razer Huntsman Mini', 'Razer', 'Huntsman Mini', 119.99, 0, 0, 4.4, 'Compact 60% optical gaming keyboard'),
+    ('SteelSeries Apex 7', 'SteelSeries', 'Apex 7', 149.99, 0, 0, 4.4, 'Mechanical gaming keyboard with OLED smart display'),
+    ('Logitech MX Keys', 'Logitech', 'MX Keys', 119.99, 0, 0, 4.5, 'Wireless illuminated keyboard for productivity'),
+    ('Logitech G413 SE', 'Logitech G', 'G413 SE', 69.99, 0, 0, 4.3, 'Mechanical gaming keyboard with durable aluminum top case')
 ) AS v(name, brand, model, price, stock_qty, power_watts, rating, description)
 CROSS JOIN cat;
 
@@ -136,7 +154,13 @@ FROM (
     ('MSI Optix MAG274QRF-QD', 'MSI', 'MAG274QRF-QD', 449.99, 8, 0, 4.5, '27-inch QHD gaming monitor with wide color'),
     ('ViewSonic Elite XG270QG', 'ViewSonic', 'XG270QG', 599.99, 6, 0, 4.4, '27-inch QHD gaming monitor'),
     ('HP OMEN 27qs', 'HP', 'OMEN 27qs', 349.99, 8, 0, 4.4, '27-inch QHD gaming monitor'),
-    ('AOC CQ27G2', 'AOC', 'CQ27G2', 249.99, 10, 0, 4.3, '27-inch curved QHD gaming monitor')
+    ('AOC CQ27G2', 'AOC', 'CQ27G2', 249.99, 10, 0, 4.3, '27-inch curved QHD gaming monitor'),
+    -- out of stock
+    ('Alienware AW3423DWF', 'Alienware', 'AW3423DWF', 999.99, 0, 0, 4.6, '34-inch QD-OLED ultrawide gaming monitor'),
+    ('BenQ ZOWIE XL2546K', 'BenQ', 'XL2546K', 499.99, 0, 0, 4.5, '24.5-inch esports gaming monitor with high refresh rate'),
+    ('ASUS ProArt PA278CV', 'ASUS', 'PA278CV', 329.99, 0, 0, 4.5, '27-inch QHD professional monitor with USB-C'),
+    ('Samsung Smart Monitor M8', 'Samsung', 'Smart Monitor M8', 699.99, 0, 0, 4.3, '32-inch smart monitor with streaming apps and USB-C'),
+    ('LG OLED evo C2 42-inch', 'LG', 'OLED42C2', 999.99, 0, 0, 4.6, '42-inch OLED display often used as a gaming monitor')
 ) AS v(name, brand, model, price, stock_qty, power_watts, rating, description)
 CROSS JOIN cat;
 
@@ -169,7 +193,13 @@ FROM (
     ('Glorious Model D', 'Glorious', 'Model D', 49.99, 25, 0, 4.4, 'Ergonomic lightweight gaming mouse'),
     ('Zowie EC2-C', 'Zowie', 'EC2-C', 69.99, 20, 0, 4.4, 'Ergonomic esports mouse designed for competitive play'),
     ('Zowie FK2-C', 'Zowie', 'FK2-C', 69.99, 20, 0, 4.4, 'Ambidextrous esports mouse designed for competitive play'),
-    ('HyperX Pulsefire Haste 2 Wireless', 'HyperX', 'Pulsefire Haste 2 Wireless', 89.99, 20, 0, 4.4, 'Lightweight wireless gaming mouse')
+    ('HyperX Pulsefire Haste 2 Wireless', 'HyperX', 'Pulsefire Haste 2 Wireless', 89.99, 20, 0, 4.4, 'Lightweight wireless gaming mouse'),
+    -- out of stock
+    ('Logitech MX Master 3S', 'Logitech', 'MX Master 3S', 99.99, 0, 0, 4.6, 'Wireless mouse designed for productivity with MagSpeed scrolling'),
+    ('Logitech MX Anywhere 3', 'Logitech', 'MX Anywhere 3', 79.99, 0, 0, 4.5, 'Compact wireless mouse for travel and multi-device use'),
+    ('Razer Orochi V2', 'Razer', 'Orochi V2', 69.99, 0, 0, 4.4, 'Compact wireless gaming mouse designed for portability'),
+    ('Razer Viper Mini', 'Razer', 'Viper Mini', 39.99, 0, 0, 4.5, 'Lightweight wired gaming mouse for small-to-medium hands'),
+    ('SteelSeries Rival 3', 'SteelSeries', 'Rival 3', 29.99, 0, 0, 4.3, 'Wired gaming mouse designed for durability and performance')
 ) AS v(name, brand, model, price, stock_qty, power_watts, rating, description)
 CROSS JOIN cat;
 

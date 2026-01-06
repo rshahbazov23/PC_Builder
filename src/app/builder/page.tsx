@@ -74,10 +74,10 @@ export default function BuilderPage() {
       {/* Hero */}
       <section className="bg-background border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">PC Builder</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Saved Builds</h1>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Select your components and we&apos;ll check compatibility automatically. 
-            CPU sockets, RAM types, GPU clearance — all handled.
+            Create, revisit, and refine builds over time. The wizard guides you step-by-step,
+            and compatibility checks are available inside each component step.
           </p>
           <Button 
             size="lg" 
@@ -94,9 +94,9 @@ export default function BuilderPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {!loading && builds.length > 0 && (
           <>
-            <h2 className="text-sm text-muted-foreground mb-4">Your Recent Builds</h2>
+            <h2 className="text-sm text-muted-foreground mb-4">All Builds</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {builds.slice(0, 6).map((build) => (
+              {builds.map((build) => (
                 <Link 
                   key={build.build_id} 
                   href={`/builder/${build.build_id}`}

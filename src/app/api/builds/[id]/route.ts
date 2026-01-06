@@ -70,3 +70,43 @@ export async function DELETE(
     );
   }
 }
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const buildId = parseInt(params.id);
+    const body = await request.json();
+    const { name, description } = body as { name?: string; description?: string | null };
+
+    if (!name || !name.trim()) {
+      return NextResponse.json(
+        { error: 'Build name is required' },
+        { status: 400 }
+      );
+    }
+
+    await execute(
+      `UPDATE Build
+       SET name = $2,
+           description = $3,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE build_id = $1`,
+      [buildId, name.trim(), description ?? null]
+    );
+
+    const updated = await queryOne<Build>(
+      'SELECT * FROM Build WHERE build_id = $1',
+      [buildId]
+    );
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('Error updating build:', error);
+    return NextResponse.json(
+      { error: 'Failed to update build' },
+      { status: 500 }
+    );
+  }
+}

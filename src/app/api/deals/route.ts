@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { Product } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 interface DealProduct extends Product {
   category_name: string;
   category_avg_price: number;

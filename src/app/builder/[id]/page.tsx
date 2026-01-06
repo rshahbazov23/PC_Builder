@@ -132,13 +132,13 @@ export default function BuildPage() {
     [build]
   );
 
-  const prerequisites = useMemo(() => {
+  const prerequisites = useMemo<Partial<Record<SlotType, { ok: boolean; reason: string }>>>(() => {
     return {
       MOBO: { ok: !!getItemBySlot('CPU'), reason: 'Pick a CPU first to match socket.' },
       RAM: { ok: !!getItemBySlot('MOBO'), reason: 'Pick a motherboard first to match RAM type.' },
       CASE: { ok: !!getItemBySlot('GPU') && !!getItemBySlot('MOBO'), reason: 'Pick GPU + motherboard first.' },
       PSU: { ok: (build?.items.length || 0) > 0, reason: 'Add at least one part first.' },
-    } satisfies Partial<Record<SlotType, { ok: boolean; reason: string }>>;
+    };
   }, [build, getItemBySlot]);
 
   const ensureAllForSlot = useCallback(

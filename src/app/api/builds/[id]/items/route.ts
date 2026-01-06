@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query, execute, queryOne } from '@/lib/db';
 import { SlotType, Product } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 const VALID_SLOTS: SlotType[] = ['CPU', 'GPU', 'RAM', 'MOBO', 'PSU', 'CASE', 'STORAGE'];
 
 const CATEGORY_TO_SLOT: Record<string, SlotType> = {

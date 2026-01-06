@@ -14,14 +14,31 @@ export async function GET(request: NextRequest) {
     const maxPrice = searchParams.get('maxPrice');
     const minRating = searchParams.get('minRating');
     const inStock = searchParams.get('inStock');
+    const socket = searchParams.get('socket');
+    const ramType = searchParams.get('ramType');
+    const storageType = searchParams.get('storageType');
+    const minVram = searchParams.get('minVram');
+    const minWattage = searchParams.get('minWattage');
+    const formFactor = searchParams.get('formFactor');
     const sort = searchParams.get('sort');
     const limitRaw = searchParams.get('limit');
     const offsetRaw = searchParams.get('offset');
+
+    // Category-specific spec joins (only when category is specified)
+    let specJoin = '';
+    if (category === 'cpu') specJoin = ' LEFT JOIN CPU_Spec cpu ON cpu.product_id = p.product_id';
+    if (category === 'motherboard') specJoin = ' LEFT JOIN MOBO_Spec mobo ON mobo.product_id = p.product_id';
+    if (category === 'gpu') specJoin = ' LEFT JOIN GPU_Spec gpu ON gpu.product_id = p.product_id';
+    if (category === 'ram') specJoin = ' LEFT JOIN RAM_Spec ram ON ram.product_id = p.product_id';
+    if (category === 'psu') specJoin = ' LEFT JOIN PSU_Spec psu ON psu.product_id = p.product_id';
+    if (category === 'case') specJoin = ' LEFT JOIN CASE_Spec cs ON cs.product_id = p.product_id';
+    if (category === 'storage') specJoin = ' LEFT JOIN Storage_Spec st ON st.product_id = p.product_id';
 
     let sql = `
       SELECT p.*, c.name AS category_name, c.slug AS category_slug
       FROM Product p
       JOIN Category c ON p.category_id = c.category_id
+      ${specJoin}
       WHERE 1=1
     `;
     const params: (string | number)[] = [];
@@ -61,6 +78,51 @@ export async function GET(request: NextRequest) {
     if (minRating) {
       sql += ` AND p.rating >= $${paramIndex++}`;
       params.push(parseFloat(minRating));
+    }
+
+    // Category-specific filters (same as browse)
+    if (socket && category === 'cpu') {
+      sql += ` AND cpu.socket = $${paramIndex++}`;
+      params.push(socket);
+    }
+    if (socket && category === 'motherboard') {
+      sql += ` AND mobo.socket = $${paramIndex++}`;
+      params.push(socket);
+    }
+    if (ramType && category === 'ram') {
+      sql += ` AND ram.ram_type = $${paramIndex++}`;
+      params.push(ramType);
+    }
+    if (ramType && category === 'motherboard') {
+      sql += ` AND mobo.ram_type = $${paramIndex++}`;
+      params.push(ramType);
+    }
+    if (storageType && category === 'storage') {
+      sql += ` AND st.storage_type = $${paramIndex++}`;
+      params.push(storageType);
+    }
+    if (formFactor && category === 'case') {
+      sql += ` AND cs.supported_form_factor = $${paramIndex++}`;
+      params.push(formFactor);
+    }
+    // (Bonus) form factor filter for motherboards
+    if (formFactor && category === 'motherboard') {
+      sql += ` AND mobo.form_factor = $${paramIndex++}`;
+      params.push(formFactor);
+    }
+    if (minVram && category === 'gpu') {
+      const v = parseInt(minVram, 10);
+      if (!Number.isNaN(v)) {
+        sql += ` AND gpu.vram_gb >= $${paramIndex++}`;
+        params.push(v);
+      }
+    }
+    if (minWattage && category === 'psu') {
+      const w = parseInt(minWattage, 10);
+      if (!Number.isNaN(w)) {
+        sql += ` AND psu.wattage >= $${paramIndex++}`;
+        params.push(w);
+      }
     }
 
     if (inStock === 'true') {

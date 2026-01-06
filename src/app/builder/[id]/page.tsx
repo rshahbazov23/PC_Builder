@@ -36,6 +36,39 @@ interface Build {
 type StepId = SlotType | 'SUMMARY';
 type ViewMode = 'all' | 'smart';
 
+type SlotFilters = {
+  brand: string;
+  minPrice: string;
+  maxPrice: string;
+  minRating: string;
+  inStock: boolean;
+  sort: 'rating_desc' | 'price_asc' | 'price_desc' | 'name_asc' | 'newest' | 'stock_desc';
+  limit: '24' | '60' | '120' | '200';
+  // category-specific (matches browse)
+  socket: string;
+  ramType: string;
+  storageType: string;
+  minVram: string;
+  minWattage: string;
+  formFactor: string;
+};
+
+const DEFAULT_FILTERS: SlotFilters = {
+  brand: '',
+  minPrice: '',
+  maxPrice: '',
+  minRating: '',
+  inStock: false,
+  sort: 'rating_desc',
+  limit: '60',
+  socket: '',
+  ramType: '',
+  storageType: '',
+  minVram: '',
+  minWattage: '',
+  formFactor: '',
+};
+
 const STEPS: { id: StepId; label: string; help: string }[] = [
   { id: 'CPU', label: 'cpu', help: 'Pick your processor first.' },
   { id: 'MOBO', label: 'motherboard', help: 'Optionally switch to compatible mode (CPU socket).' },
@@ -96,8 +129,10 @@ export default function BuildPage() {
 
   const [viewMode, setViewMode] = useState<Partial<Record<SlotType, ViewMode>>>({});
   const [search, setSearch] = useState<Partial<Record<SlotType, string>>>({});
+  const [filters, setFilters] = useState<Partial<Record<SlotType, SlotFilters>>>({});
 
   const [allProducts, setAllProducts] = useState<Partial<Record<SlotType, Product[]>>>({});
+  const [allProductsQueryKey, setAllProductsQueryKey] = useState<Partial<Record<SlotType, string>>>({});
   const [smartProducts, setSmartProducts] = useState<Partial<Record<SlotType, Product[]>>>({});
   const [smartInfo, setSmartInfo] = useState<Partial<Record<SlotType, Record<string, unknown>>>>({});
 
@@ -106,6 +141,13 @@ export default function BuildPage() {
   const [draftName, setDraftName] = useState('');
   const [draftDescription, setDraftDescription] = useState('');
   const [savingBuild, setSavingBuild] = useState(false);
+
+  const updateFilters = useCallback((slotType: SlotType, patch: Partial<SlotFilters>) => {
+    setFilters(prev => {
+      const current = { ...DEFAULT_FILTERS, ...(prev[slotType] ?? {}) };
+      return { ...prev, [slotType]: { ...current, ...patch } };
+    });
+  }, []);
 
   const fetchBuild = useCallback(async () => {
     try {
@@ -143,25 +185,50 @@ export default function BuildPage() {
 
   const ensureAllForSlot = useCallback(
     async (slotType: SlotType) => {
-      if (allProducts[slotType]) return;
-
-      setLoadingProductsKey(`${slotType}:all`);
       try {
         const category = SLOT_TO_CATEGORY[slotType];
-        const res = await fetch(`/api/products?category=${encodeURIComponent(category)}&limit=200&sort=rating_desc`, {
-          cache: 'no-store',
-        });
+        const f = { ...DEFAULT_FILTERS, ...(filters[slotType] ?? {}) };
+        const q = (search[slotType] ?? '').trim();
+
+        const urlParams = new URLSearchParams();
+        urlParams.set('category', category);
+        urlParams.set('limit', f.limit);
+        urlParams.set('offset', '0');
+        urlParams.set('sort', f.sort);
+        if (q) urlParams.set('q', q);
+        if (f.brand) urlParams.set('brand', f.brand);
+        if (f.minPrice) urlParams.set('minPrice', f.minPrice);
+        if (f.maxPrice) urlParams.set('maxPrice', f.maxPrice);
+        if (f.minRating) urlParams.set('minRating', f.minRating);
+        if (f.inStock) urlParams.set('inStock', 'true');
+
+        // category-specific (same as browse)
+        if (f.socket) urlParams.set('socket', f.socket);
+        if (f.ramType) urlParams.set('ramType', f.ramType);
+        if (f.storageType) urlParams.set('storageType', f.storageType);
+        if (f.minVram) urlParams.set('minVram', f.minVram);
+        if (f.minWattage) urlParams.set('minWattage', f.minWattage);
+        if (f.formFactor) urlParams.set('formFactor', f.formFactor);
+
+        const url = `/api/products?${urlParams.toString()}`;
+        const prevKey = allProductsQueryKey[slotType];
+        if (prevKey === url && allProducts[slotType]) return;
+
+        setLoadingProductsKey(`${slotType}:all`);
+        const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to load products');
         const data = (await res.json()) as Product[];
         setAllProducts(prev => ({ ...prev, [slotType]: data }));
+        setAllProductsQueryKey(prev => ({ ...prev, [slotType]: url }));
       } catch (error) {
         console.error('Error fetching products:', error);
         setAllProducts(prev => ({ ...prev, [slotType]: [] }));
+        setAllProductsQueryKey(prev => ({ ...prev, [slotType]: '' }));
       } finally {
         setLoadingProductsKey(null);
       }
     },
-    [allProducts]
+    [allProducts, allProductsQueryKey, filters, search]
   );
 
   const fetchSmartForSlot = useCallback(
@@ -194,13 +261,14 @@ export default function BuildPage() {
     [buildId]
   );
 
-  // Prefetch the “all products” list for the current slot step
+  // Keep the “show_all()” list in sync with browse-style filters for the active slot
   useEffect(() => {
     if (!build) return;
     if (activeStep === 'SUMMARY') return;
     const slot = activeStep as SlotType;
+    if ((viewMode[slot] ?? 'all') !== 'all') return;
     void ensureAllForSlot(slot);
-  }, [activeStep, build, ensureAllForSlot]);
+  }, [activeStep, build, ensureAllForSlot, filters, search, viewMode]);
 
   const addToBuild = useCallback(
     async (product: Product) => {
@@ -277,6 +345,10 @@ export default function BuildPage() {
   const currentSlot = activeStep === 'SUMMARY' ? null : (activeStep as SlotType);
   const currentMode = currentSlot ? (viewMode[currentSlot] ?? 'all') : 'all';
   const currentSearch = currentSlot ? (search[currentSlot] ?? '') : '';
+  const currentFilters = useMemo(() => {
+    if (!currentSlot) return DEFAULT_FILTERS;
+    return { ...DEFAULT_FILTERS, ...(filters[currentSlot] ?? {}) };
+  }, [currentSlot, filters]);
 
   const displayedProducts = useMemo(() => {
     if (!currentSlot) return [];
@@ -286,14 +358,63 @@ export default function BuildPage() {
         ? (smartProducts[currentSlot] ?? [])
         : (allProducts[currentSlot] ?? []);
 
-    if (!currentSearch.trim()) return base;
+    // Apply browse-style filters (client-side for smart results; server-side + client-side for show_all)
+    let filtered = base;
+
     const q = currentSearch.trim().toLowerCase();
-    return base.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q) ||
-      (p.model || '').toLowerCase().includes(q)
-    );
-  }, [allProducts, currentMode, currentSearch, currentSlot, smartProducts]);
+    if (q) {
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.brand.toLowerCase().includes(q) ||
+        (p.model || '').toLowerCase().includes(q)
+      );
+    }
+
+    if (currentFilters.brand) {
+      filtered = filtered.filter(p => p.brand === currentFilters.brand);
+    }
+
+    const minP = currentFilters.minPrice ? parseFloat(currentFilters.minPrice) : null;
+    const maxP = currentFilters.maxPrice ? parseFloat(currentFilters.maxPrice) : null;
+    if (minP !== null && !Number.isNaN(minP)) filtered = filtered.filter(p => Number(p.price) >= minP);
+    if (maxP !== null && !Number.isNaN(maxP)) filtered = filtered.filter(p => Number(p.price) <= maxP);
+
+    const minR = currentFilters.minRating ? parseFloat(currentFilters.minRating) : null;
+    if (minR !== null && !Number.isNaN(minR)) filtered = filtered.filter(p => Number(p.rating) >= minR);
+
+    if (currentFilters.inStock) {
+      filtered = filtered.filter(p => Number(p.stock_qty) > 0);
+    }
+
+    // Sorting
+    const sorted = [...filtered];
+    switch (currentFilters.sort) {
+      case 'price_asc':
+        sorted.sort((a, b) => Number(a.price) - Number(b.price));
+        break;
+      case 'price_desc':
+        sorted.sort((a, b) => Number(b.price) - Number(a.price));
+        break;
+      case 'name_asc':
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'newest':
+        // created_at is not always serialized as Date on client; skip strict ordering here
+        sorted.sort((a, b) => Number(b.rating) - Number(a.rating));
+        break;
+      case 'stock_desc':
+        sorted.sort((a, b) => Number(b.stock_qty) - Number(a.stock_qty));
+        break;
+      case 'rating_desc':
+      default:
+        sorted.sort((a, b) => Number(b.rating) - Number(a.rating));
+        break;
+    }
+
+    const limit = parseInt(currentFilters.limit, 10);
+    if (!Number.isNaN(limit) && limit > 0) return sorted.slice(0, limit);
+    return sorted;
+  }, [allProducts, currentFilters, currentMode, currentSearch, currentSlot, smartProducts]);
 
   const smartMetaLine = useMemo(() => {
     if (!currentSlot) return null;
@@ -486,11 +607,20 @@ export default function BuildPage() {
                   const prereq = prerequisites[slot];
                   const mode = viewMode[slot] ?? 'all';
                   const s = search[slot] ?? '';
+                  const f = { ...DEFAULT_FILTERS, ...(filters[slot] ?? {}) };
                   const isLoading =
                     loadingProductsKey === `${slot}:all` ||
                     loadingProductsKey === `${slot}:smart`;
 
                   const selected = getItemBySlot(slot);
+                  const brandCounts = (mode === 'smart' ? (smartProducts[slot] ?? []) : (allProducts[slot] ?? []))
+                    .reduce((acc, p) => {
+                      const key = p.brand;
+                      acc[key] = (acc[key] || 0) + 1;
+                      return acc;
+                    }, {} as Record<string, number>);
+                  const brandOptions = Object.entries(brandCounts).sort((a, b) => b[1] - a[1]);
+                  const disableSpecFilters = mode === 'smart';
 
                   return (
                     <div key={step.id} className="w-full flex-shrink-0 p-6">
@@ -508,16 +638,279 @@ export default function BuildPage() {
                         </div>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                        <Input
-                          value={s}
-                          onChange={(e) => setSearch(prev => ({ ...prev, [slot]: e.target.value }))}
-                          placeholder="search..."
-                          className="sm:max-w-xs"
-                        />
-
-                        <div className="flex items-center gap-2">
+                      {/* Navigation (moved to top) */}
+                      <div className="flex items-center justify-between gap-4 mb-4">
                 <Button
+                  variant="outline"
+                          className="font-mono"
+                          onClick={goBack}
+                          disabled={activeStepIndex === 0}
+                        >
+                          ← back
+                        </Button>
+
+                        <div className="text-xs text-muted-foreground font-mono">
+                          step {activeStepIndex + 1}/{STEPS.length}
+                        </div>
+
+                        <Button className="font-mono" onClick={goNext}>
+                          next →
+                        </Button>
+                      </div>
+
+                      {/* Filters (same spirit as browse) */}
+                      <Card className="p-4 mb-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-xs font-mono text-muted-foreground">./filters</h3>
+                          <Button
+                            variant="ghost"
+                            className="font-mono text-xs"
+                            onClick={() => {
+                              setSearch(prev => ({ ...prev, [slot]: '' }));
+                              setFilters(prev => ({ ...prev, [slot]: { ...DEFAULT_FILTERS } }));
+                              if (mode === 'all') void ensureAllForSlot(slot);
+                            }}
+                          >
+                            reset()
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {/* Search */}
+                          <div className="lg:col-span-1">
+                            <label className="block text-xs font-mono text-muted-foreground mb-1">search</label>
+                            <Input
+                              value={s}
+                              onChange={(e) => setSearch(prev => ({ ...prev, [slot]: e.target.value }))}
+                              placeholder="name, model, brand..."
+                              className="text-sm"
+                            />
+                          </div>
+
+                          {/* Brand */}
+                          <div>
+                            <label className="block text-xs font-mono text-muted-foreground mb-1">brand</label>
+                            <select
+                              value={f.brand}
+                              onChange={(e) => updateFilters(slot, { brand: e.target.value })}
+                              className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors"
+                            >
+                              <option value="">all</option>
+                              {brandOptions.map(([b, count]) => (
+                                <option key={b} value={b}>
+                                  {b} ({count})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Sort */}
+                          <div>
+                            <label className="block text-xs font-mono text-muted-foreground mb-1">sort</label>
+                            <select
+                              value={f.sort}
+                              onChange={(e) => updateFilters(slot, { sort: e.target.value as SlotFilters['sort'] })}
+                              className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors"
+                            >
+                              <option value="rating_desc">rating ↓</option>
+                              <option value="price_asc">price ↑</option>
+                              <option value="price_desc">price ↓</option>
+                              <option value="name_asc">name A→Z</option>
+                              <option value="newest">newest</option>
+                              <option value="stock_desc">stock ↓</option>
+                            </select>
+                          </div>
+
+                          {/* Price */}
+                          <div>
+                            <label className="block text-xs font-mono text-muted-foreground mb-1">min_price</label>
+                            <Input
+                              type="number"
+                              value={f.minPrice}
+                              onChange={(e) => updateFilters(slot, { minPrice: e.target.value })}
+                              placeholder="min"
+                              className="text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-mono text-muted-foreground mb-1">max_price</label>
+                            <Input
+                              type="number"
+                              value={f.maxPrice}
+                              onChange={(e) => updateFilters(slot, { maxPrice: e.target.value })}
+                              placeholder="max"
+                              className="text-sm"
+                            />
+                          </div>
+
+                          {/* Min rating */}
+                          <div>
+                            <label className="block text-xs font-mono text-muted-foreground mb-1">min_rating</label>
+                            <select
+                              value={f.minRating}
+                              onChange={(e) => updateFilters(slot, { minRating: e.target.value })}
+                              className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors"
+                            >
+                              <option value="">any</option>
+                              <option value="3.0">3.0+</option>
+                              <option value="4.0">4.0+</option>
+                              <option value="4.5">4.5+</option>
+                              <option value="4.8">4.8+</option>
+                            </select>
+                          </div>
+
+                          {/* In stock */}
+                          <div className="flex items-end gap-2">
+                            <input
+                              type="checkbox"
+                              checked={f.inStock}
+                              onChange={(e) => updateFilters(slot, { inStock: e.target.checked })}
+                              className="rounded-none border-border"
+                              id={`inStock-${slot}`}
+                            />
+                            <label htmlFor={`inStock-${slot}`} className="text-sm font-mono text-muted-foreground">
+                              in_stock only
+                            </label>
+                          </div>
+
+                          {/* Limit */}
+                          <div>
+                            <label className="block text-xs font-mono text-muted-foreground mb-1">limit</label>
+                            <select
+                              value={f.limit}
+                              onChange={(e) => updateFilters(slot, { limit: e.target.value as SlotFilters['limit'] })}
+                              className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors"
+                            >
+                              <option value="24">24</option>
+                              <option value="60">60</option>
+                              <option value="120">120</option>
+                              <option value="200">200</option>
+                            </select>
+                          </div>
+
+                          {/* Category-specific filters */}
+                          {(slot === 'CPU' || slot === 'MOBO') && (
+                            <div>
+                              <label className="block text-xs font-mono text-muted-foreground mb-1">
+                                socket {disableSpecFilters ? '(show_all only)' : ''}
+                              </label>
+                              <select
+                                value={f.socket}
+                                disabled={disableSpecFilters}
+                                onChange={(e) => updateFilters(slot, { socket: e.target.value })}
+                                className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors disabled:opacity-50"
+                              >
+                                <option value="">all</option>
+                                <option value="LGA1700">LGA1700</option>
+                                <option value="AM5">AM5</option>
+                                <option value="AM4">AM4</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {(slot === 'MOBO' || slot === 'RAM') && (
+                            <div>
+                              <label className="block text-xs font-mono text-muted-foreground mb-1">
+                                ram_type {disableSpecFilters ? '(show_all only)' : ''}
+                              </label>
+                              <select
+                                value={f.ramType}
+                                disabled={disableSpecFilters}
+                                onChange={(e) => updateFilters(slot, { ramType: e.target.value })}
+                                className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors disabled:opacity-50"
+                              >
+                                <option value="">all</option>
+                                <option value="DDR5">DDR5</option>
+                                <option value="DDR4">DDR4</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {slot === 'STORAGE' && (
+                            <div>
+                              <label className="block text-xs font-mono text-muted-foreground mb-1">
+                                storage_type {disableSpecFilters ? '(show_all only)' : ''}
+                              </label>
+                              <select
+                                value={f.storageType}
+                                disabled={disableSpecFilters}
+                                onChange={(e) => updateFilters(slot, { storageType: e.target.value })}
+                                className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors disabled:opacity-50"
+                              >
+                                <option value="">all</option>
+                                <option value="NVMe">NVMe</option>
+                                <option value="SSD">SSD</option>
+                                <option value="HDD">HDD</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {slot === 'GPU' && (
+                            <div>
+                              <label className="block text-xs font-mono text-muted-foreground mb-1">
+                                min_vram_gb {disableSpecFilters ? '(show_all only)' : ''}
+                              </label>
+                              <select
+                                value={f.minVram}
+                                disabled={disableSpecFilters}
+                                onChange={(e) => updateFilters(slot, { minVram: e.target.value })}
+                                className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors disabled:opacity-50"
+                              >
+                                <option value="">any</option>
+                                <option value="8">8+</option>
+                                <option value="12">12+</option>
+                                <option value="16">16+</option>
+                                <option value="20">20+</option>
+                                <option value="24">24+</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {slot === 'PSU' && (
+                            <div>
+                              <label className="block text-xs font-mono text-muted-foreground mb-1">
+                                min_wattage {disableSpecFilters ? '(show_all only)' : ''}
+                              </label>
+                              <select
+                                value={f.minWattage}
+                                disabled={disableSpecFilters}
+                                onChange={(e) => updateFilters(slot, { minWattage: e.target.value })}
+                                className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors disabled:opacity-50"
+                              >
+                                <option value="">any</option>
+                                <option value="550">550+</option>
+                                <option value="650">650+</option>
+                                <option value="750">750+</option>
+                                <option value="850">850+</option>
+                                <option value="1000">1000+</option>
+                                <option value="1200">1200+</option>
+                                <option value="1500">1500+</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {(slot === 'CASE' || slot === 'MOBO') && (
+                            <div>
+                              <label className="block text-xs font-mono text-muted-foreground mb-1">
+                                form_factor {disableSpecFilters ? '(show_all only)' : ''}
+                              </label>
+                              <select
+                                value={f.formFactor}
+                                disabled={disableSpecFilters}
+                                onChange={(e) => updateFilters(slot, { formFactor: e.target.value })}
+                                className="w-full px-3 py-2 text-sm bg-background border border-border focus:border-foreground outline-none transition-colors disabled:opacity-50"
+                              >
+                                <option value="">all</option>
+                                <option value="ATX">ATX</option>
+                                <option value="Micro-ATX">Micro-ATX</option>
+                                <option value="Mini-ITX">Mini-ITX</option>
+                              </select>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 mt-4">
+                          <Button
                             variant={mode === 'all' ? 'default' : 'outline'}
                             className="font-mono text-xs"
                             onClick={() => {
@@ -545,15 +938,15 @@ export default function BuildPage() {
 
                           {selected && (
                 <Button
-                              variant="ghost"
+                  variant="outline"
                               className="font-mono text-xs"
                               onClick={() => removeFromBuild(slot)}
-                            >
+                >
                               remove()
-                            </Button>
+                </Button>
                           )}
-                        </div>
-                      </div>
+              </div>
+            </Card>
 
                       {mode === 'smart' && prereq && !prereq.ok && (
                         <Card className="p-4 mb-4 border-dashed">
@@ -606,22 +999,6 @@ export default function BuildPage() {
                           </p>
                         </Card>
                       )}
-
-                      <Separator className="my-6" />
-
-                      <div className="flex items-center justify-between gap-4">
-                        <Button variant="outline" className="font-mono" onClick={goBack} disabled={activeStepIndex === 0}>
-                          ← back
-                        </Button>
-
-                        <div className="text-xs text-muted-foreground font-mono">
-                          tip: you can jump steps using the top bar
-                        </div>
-
-                        <Button className="font-mono" onClick={goNext}>
-                          next →
-                </Button>
-                      </div>
                     </div>
                   );
                 })}

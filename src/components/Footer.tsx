@@ -17,9 +17,6 @@ export function Footer() {
               Automatic compatibility checking, power calculations, 
               and curated deals.
             </p>
-            <div className="mt-4 text-xs text-muted-foreground/60">
-              {'// COMP306 Database Management Systems'}
-            </div>
           </div>
 
           {/* Components */}
@@ -56,7 +53,7 @@ export function Footer() {
             © {new Date().getFullYear()} ku_build
           </p>
           <p className="text-xs text-muted-foreground font-mono">
-            {'v1.0.0 // made with next.js + postgresql'}
+            {'v1.0.0'}
           </p>
         </div>
       </div>

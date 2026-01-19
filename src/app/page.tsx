@@ -227,8 +227,8 @@ export default async function HomePage() {
           {/* PC Builder Card */}
           <div className="bg-background border border-border p-5">
             <h2 className="font-bold text-lg mb-4">PC Builder</h2>
-            <div className="aspect-video bg-muted flex items-center justify-center mb-4">
-              <div className="text-4xl">🖥️</div>
+            <div className="aspect-video bg-muted flex items-center justify-center mb-4 relative overflow-hidden">
+              <Image src="/images/PC-BUILDER-HERO.png" alt="PC Builder" fill className="object-contain p-2" sizes="25vw" />
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               Check part compatibility automatically

@@ -86,19 +86,19 @@ async function getProductCounts() {
   }
 }
 
-const categoryData: Record<string, { icon: string; bg: string }> = {
-  cpu: { icon: '⬡', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  gpu: { icon: '▣', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  motherboard: { icon: '⬢', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  ram: { icon: '▤', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  storage: { icon: '◉', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  psu: { icon: '⚡', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  case: { icon: '▢', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  cooler: { icon: '❄', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  monitor: { icon: '🖥️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  keyboard: { icon: '⌨️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  mouse: { icon: '🖱️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
-  headset: { icon: '🎧', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200' },
+const categoryData: Record<string, { icon: string; bg: string; image: string }> = {
+  cpu: { icon: '⬡', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-CPU.png' },
+  gpu: { icon: '▣', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-GPU.png' },
+  motherboard: { icon: '⬢', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-MOTHERBOARD.png' },
+  ram: { icon: '▤', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-RAM.png' },
+  storage: { icon: '◉', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-STORAGE.png' },
+  psu: { icon: '⚡', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-PSU.png' },
+  case: { icon: '▢', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-CASE.png' },
+  cooler: { icon: '❄', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-CPU-COOLER.png' },
+  monitor: { icon: '🖥️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-MONITOR.png' },
+  keyboard: { icon: '⌨️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-KEYBOARD.png' },
+  mouse: { icon: '🖱️', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-MOUSE.png' },
+  headset: { icon: '🎧', bg: 'bg-gradient-to-br from-zinc-100 to-zinc-200', image: '/images/categories/CATEGORY-HEADSET.png' },
 };
 
 export default async function HomePage() {
@@ -186,7 +186,13 @@ export default async function HomePage() {
                   href={`/category/${cat.slug}`}
                   className={`${categoryData[cat.slug]?.bg || 'bg-muted'} p-4 hover:opacity-90 transition-opacity`}
                 >
-                  <div className="text-3xl mb-2">{categoryData[cat.slug]?.icon || '◎'}</div>
+                  <div className="h-16 mb-2 relative">
+                    {categoryData[cat.slug]?.image ? (
+                      <Image src={categoryData[cat.slug].image} alt={cat.name} fill className="object-contain" sizes="15vw" />
+                    ) : (
+                      <div className="text-3xl">{categoryData[cat.slug]?.icon || '◎'}</div>
+                    )}
+                  </div>
                   <div className="text-sm font-medium">{cat.name}</div>
                 </Link>
               ))}
@@ -303,8 +309,12 @@ export default async function HomePage() {
                 href={`/category/${cat.slug}`}
                 className="text-center group"
               >
-                <div className="aspect-square bg-muted flex items-center justify-center text-3xl mb-2 group-hover:bg-muted/70 transition-colors">
-                  {categoryData[cat.slug]?.icon || '◎'}
+                <div className="aspect-square bg-muted flex items-center justify-center text-3xl mb-2 group-hover:bg-muted/70 transition-colors relative overflow-hidden">
+                  {categoryData[cat.slug]?.image ? (
+                    <Image src={categoryData[cat.slug].image} alt={cat.name} fill className="object-contain p-2" sizes="15vw" />
+                  ) : (
+                    categoryData[cat.slug]?.icon || '◎'
+                  )}
                 </div>
                 <div className="text-xs font-medium group-hover:text-blue-600">{cat.name}</div>
                 <div className="text-xs text-muted-foreground">{productCounts[cat.slug] || 0} items</div>

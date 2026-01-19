@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { query } from '@/lib/db';
 import { Category, Product } from '@/lib/types';
 import { ProductCard } from '@/components/ProductCard';
@@ -131,13 +132,17 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="hidden md:grid grid-cols-3 gap-2">
-              {['cpu', 'gpu', 'ram', 'motherboard', 'storage', 'psu'].map((slug) => (
+              {bestSellers.slice(0, 6).map((product) => (
                 <Link 
-                  key={slug}
-                  href={`/category/${slug}`}
-                  className="aspect-square bg-background/10 hover:bg-background/20 transition-colors flex items-center justify-center text-3xl"
+                  key={product.product_id}
+                  href={`/product/${product.product_id}`}
+                  className="aspect-square bg-background/10 hover:bg-background/20 transition-colors flex items-center justify-center text-3xl relative overflow-hidden"
                 >
-                  {categoryData[slug]?.icon || '◎'}
+                  {product.image_url ? (
+                    <Image src={product.image_url} alt={product.name} fill className="object-contain p-2" sizes="15vw" />
+                  ) : (
+                    categoryData[product.category_slug || '']?.icon || '◎'
+                  )}
                 </Link>
               ))}
             </div>
@@ -197,8 +202,12 @@ export default async function HomePage() {
             <div className="grid grid-cols-2 gap-2">
               {deals.slice(0, 4).map((p) => (
                 <Link key={p.product_id} href={`/product/${p.product_id}`} className="group">
-                  <div className="aspect-square bg-muted flex items-center justify-center text-2xl mb-1">
-                    {categoryData[p.category_slug || '']?.icon || '◎'}
+                  <div className="aspect-square bg-muted flex items-center justify-center text-2xl mb-1 relative overflow-hidden">
+                    {p.image_url ? (
+                      <Image src={p.image_url} alt={p.name} fill className="object-contain p-2" sizes="25vw" />
+                    ) : (
+                      categoryData[p.category_slug || '']?.icon || '◎'
+                    )}
                   </div>
                   <div className="text-xs text-red-600 font-semibold">-{p.savings_percentage}%</div>
                 </Link>
@@ -236,8 +245,12 @@ export default async function HomePage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {deals.slice(0, 5).map((product) => (
                 <Link key={product.product_id} href={`/product/${product.product_id}`} className="group">
-                  <div className="aspect-square bg-muted flex items-center justify-center text-4xl mb-2 group-hover:bg-muted/70 transition-colors">
-                    {categoryData[product.category_slug || '']?.icon || '◎'}
+                  <div className="aspect-square bg-muted flex items-center justify-center text-4xl mb-2 group-hover:bg-muted/70 transition-colors relative overflow-hidden">
+                    {product.image_url ? (
+                      <Image src={product.image_url} alt={product.name} fill className="object-contain p-2" sizes="20vw" />
+                    ) : (
+                      categoryData[product.category_slug || '']?.icon || '◎'
+                    )}
                   </div>
                   <div className="text-xs line-clamp-2 group-hover:text-blue-600 mb-1">{product.name}</div>
                   <div className="flex items-center gap-2">
@@ -262,8 +275,12 @@ export default async function HomePage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {topRated.slice(0, 5).map((product) => (
                 <Link key={product.product_id} href={`/product/${product.product_id}`} className="group">
-                  <div className="aspect-square bg-muted flex items-center justify-center text-4xl mb-2 group-hover:bg-muted/70 transition-colors">
-                    {categoryData[product.category_slug || '']?.icon || '◎'}
+                  <div className="aspect-square bg-muted flex items-center justify-center text-4xl mb-2 group-hover:bg-muted/70 transition-colors relative overflow-hidden">
+                    {product.image_url ? (
+                      <Image src={product.image_url} alt={product.name} fill className="object-contain p-2" sizes="20vw" />
+                    ) : (
+                      categoryData[product.category_slug || '']?.icon || '◎'
+                    )}
                   </div>
                   <div className="text-xs line-clamp-2 group-hover:text-blue-600 mb-1">{product.name}</div>
                   <div className="flex items-center gap-2">

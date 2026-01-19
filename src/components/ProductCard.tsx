@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Product } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,10 +18,20 @@ export function ProductCard({ product, onAddToBuild, showAddButton = false }: Pr
 
   return (
     <Card className="group overflow-hidden hover:border-foreground/30 transition-all duration-200">
-      {/* Product Image Placeholder */}
+      {/* Product Image */}
       <div className="aspect-square bg-muted/50 flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 dot-bg opacity-50" />
-        <CategoryIcon category={product.category_slug || ''} />
+        {product.image_url ? (
+          <Image
+            src={product.image_url}
+            alt={product.name}
+            fill
+            className="object-contain p-4"
+            sizes="(max-width: 768px) 50vw, 25vw"
+          />
+        ) : (
+          <CategoryIcon category={product.category_slug || ''} />
+        )}
         
         {/* Category badge */}
         <div className="absolute top-3 left-3">

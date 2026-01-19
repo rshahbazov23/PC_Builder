@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { query, queryOne } from '@/lib/db';
 import { Product, CPUSpec, MOBOSpec, GPUSpec, CASESpec, PSUSpec, RAMSpec, StorageSpec } from '@/lib/types';
 import { StarRating } from '@/components/ProductCard';
@@ -89,15 +90,26 @@ export default async function ProductPage({ params }: PageProps) {
           {/* Product Image */}
           <Card className="aspect-square bg-muted/30 flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 dot-bg opacity-30" />
-            <div className="text-8xl text-muted-foreground/20">
-              {product.category_slug === 'cpu' && '⬡'}
-              {product.category_slug === 'gpu' && '▣'}
-              {product.category_slug === 'motherboard' && '⬢'}
-              {product.category_slug === 'ram' && '▤'}
-              {product.category_slug === 'storage' && '◉'}
-              {product.category_slug === 'psu' && '⚡'}
-              {product.category_slug === 'case' && '▢'}
-            </div>
+            {product.image_url ? (
+              <Image
+                src={product.image_url}
+                alt={product.name}
+                fill
+                className="object-contain p-6"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
+            ) : (
+              <div className="text-8xl text-muted-foreground/20">
+                {product.category_slug === 'cpu' && '⬡'}
+                {product.category_slug === 'gpu' && '▣'}
+                {product.category_slug === 'motherboard' && '⬢'}
+                {product.category_slug === 'ram' && '▤'}
+                {product.category_slug === 'storage' && '◉'}
+                {product.category_slug === 'psu' && '⚡'}
+                {product.category_slug === 'case' && '▢'}
+              </div>
+            )}
             <Badge className="absolute top-4 left-4 font-mono">
               {product.category_slug?.toUpperCase()}
             </Badge>
@@ -167,16 +179,26 @@ export default async function ProductPage({ params }: PageProps) {
                 {similarProducts.map((p) => (
                   <Link key={p.product_id} href={`/product/${p.product_id}`}>
                     <Card className="p-4 hover:border-foreground/30 transition-colors">
-                      <div className="aspect-square bg-muted/30 rounded mb-3 flex items-center justify-center">
-                        <span className="text-2xl text-muted-foreground/30">
-                          {p.category_slug === 'cpu' && '⬡'}
-                          {p.category_slug === 'gpu' && '▣'}
-                          {p.category_slug === 'motherboard' && '⬢'}
-                          {p.category_slug === 'ram' && '▤'}
-                          {p.category_slug === 'storage' && '◉'}
-                          {p.category_slug === 'psu' && '⚡'}
-                          {p.category_slug === 'case' && '▢'}
-                        </span>
+                      <div className="aspect-square bg-muted/30 rounded mb-3 flex items-center justify-center relative overflow-hidden">
+                        {p.image_url ? (
+                          <Image
+                            src={p.image_url}
+                            alt={p.name}
+                            fill
+                            className="object-contain p-2"
+                            sizes="25vw"
+                          />
+                        ) : (
+                          <span className="text-2xl text-muted-foreground/30">
+                            {p.category_slug === 'cpu' && '⬡'}
+                            {p.category_slug === 'gpu' && '▣'}
+                            {p.category_slug === 'motherboard' && '⬢'}
+                            {p.category_slug === 'ram' && '▤'}
+                            {p.category_slug === 'storage' && '◉'}
+                            {p.category_slug === 'psu' && '⚡'}
+                            {p.category_slug === 'case' && '▢'}
+                          </span>
+                        )}
                       </div>
                       <h3 className="text-sm font-medium line-clamp-2 mb-2">{p.name}</h3>
                       <p className="font-mono font-semibold">${Number(p.price).toFixed(2)}</p>

@@ -175,14 +175,6 @@ The seed file includes:
 - 3 demo builds
 - 3 demo orders (21 order items)
 
-## For the Report
-
-1. **ER Diagram**: Use `docs/er-diagram.mmd` in [Mermaid Live Editor](https://mermaid.live/)
-2. **CREATE TABLE Statements**: Copy from `db/schema.sql`
-3. **Data Sources**: Realistic PC parts data inspired by Newegg/PCPartPicker
-4. **Advanced SQL Queries**: Copy from `docs/advanced-queries.md`
-5. **Screenshots**: Capture Home, Category, Builder, Deals, Top Brands pages
-
 ## License
 
 This project was created for educational purposes as part of COMP306 course at Koç University.

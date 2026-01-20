@@ -1,6 +1,3 @@
--- Paste this into the Neon SQL Editor for your `neondb` database:
--- https://console.neon.tech/app/projects/spring-king-03823268/branches/br-proud-leaf-ah9or1ks/sql-editor?database=neondb
---
 -- Out-of-stock ONLY (stock_qty = 0) inserts for:
 -- cooler, headset, keyboard, monitor, mouse
 --

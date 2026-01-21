@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query, execute } from '@/lib/db';
+import { query, queryOne, execute } from '@/lib/db';
 
 interface OrderWithItems {
   order_id: number;
@@ -92,13 +92,17 @@ export async function POST(request: Request) {
     const totalPrice = buildItems.reduce((sum, item) => sum + Number(item.price), 0);
 
     // Create order
-    const orderResult = await execute(
+    const orderResult = await queryOne<{ order_id: number }>(
       `INSERT INTO Orders (user_id, total_price, status, shipping_address) 
        VALUES ($1, $2, 'pending', $3) RETURNING order_id`,
       [userId, totalPrice, shippingAddress || 'Default Address']
     );
 
-    const orderId = orderResult.rows[0].order_id;
+    if (!orderResult) {
+      return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
+    }
+
+    const orderId = orderResult.order_id;
 
     // Create order items
     for (const item of buildItems) {

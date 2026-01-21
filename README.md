@@ -115,7 +115,7 @@ npm run db:setup
 
 ```bash
 psql -U postgres -f db/schema.sql
-psql -U postgres -d neondb -f db/seed.sql
+psql -U postgres -d neondb -f db/seed_combined.sql
 ```
 
 If you get permission errors, run these commands with a Postgres user that has database creation privileges (or create the DB manually).

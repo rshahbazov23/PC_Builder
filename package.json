@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:setup": "psql -U postgres -f db/schema.sql && psql -U postgres -d neondb -f db/seed.sql"
+    "db:setup": "psql -U postgres -f db/schema.sql && psql -U postgres -d neondb -f db/seed_combined.sql"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.2.6",

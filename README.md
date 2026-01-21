@@ -77,7 +77,7 @@ sudo systemctl enable --now postgresql
 #### 1) Clone the repository + install dependencies
 
 ```bash
-git clone <REPO_URL>
+git clone <https://github.com/rshahbazov23/PC_Builder.git>
 cd COMP306_Project
 npm install
 ```

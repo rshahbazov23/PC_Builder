@@ -44,7 +44,6 @@ type SlotFilters = {
   inStock: boolean;
   sort: 'rating_desc' | 'price_asc' | 'price_desc' | 'name_asc' | 'newest' | 'stock_desc';
   limit: '24' | '60' | '120' | '200';
-  // category-specific (matches browse)
   socket: string;
   ramType: string;
   storageType: string;
@@ -204,7 +203,6 @@ export default function BuildPage() {
         if (f.minRating) urlParams.set('minRating', f.minRating);
         if (f.inStock) urlParams.set('inStock', 'true');
 
-        // category-specific (same as browse)
         if (f.socket) urlParams.set('socket', f.socket);
         if (f.ramType) urlParams.set('ramType', f.ramType);
         if (f.storageType) urlParams.set('storageType', f.storageType);
@@ -263,7 +261,6 @@ export default function BuildPage() {
     [buildId]
   );
 
-  // Keep the “show_all()” list in sync with browse-style filters for the active slot
   useEffect(() => {
     if (!build) return;
     if (activeStep === 'SUMMARY') return;
@@ -281,7 +278,6 @@ export default function BuildPage() {
         body: JSON.stringify({ product_id: product.product_id }),
       });
 
-        // Smart results depend on build contents; clear cache so next “smart” fetch is accurate
         setSmartProducts({});
         setSmartInfo({});
 
@@ -337,7 +333,6 @@ export default function BuildPage() {
       router.push('/builder');
     } catch (error) {
       console.error('Error saving build:', error);
-      // fall back to just exit
       router.push('/builder');
     } finally {
       setSavingBuild(false);
@@ -349,7 +344,6 @@ export default function BuildPage() {
     
     setPlacingOrder(true);
     try {
-      // Get user ID from localStorage or default to 1
       const userId = parseInt(localStorage.getItem('selectedUserId') || '1', 10);
       
       const res = await fetch('/api/orders', {
@@ -389,7 +383,6 @@ export default function BuildPage() {
         ? (smartProducts[currentSlot] ?? [])
         : (allProducts[currentSlot] ?? []);
 
-    // Apply browse-style filters (client-side for smart results; server-side + client-side for show_all)
     let filtered = base;
 
     const q = currentSearch.trim().toLowerCase();
@@ -417,7 +410,6 @@ export default function BuildPage() {
       filtered = filtered.filter(p => Number(p.stock_qty) > 0);
     }
 
-    // Sorting
     const sorted = [...filtered];
     switch (currentFilters.sort) {
       case 'price_asc':
@@ -430,7 +422,6 @@ export default function BuildPage() {
         sorted.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'newest':
-        // created_at is not always serialized as Date on client; skip strict ordering here
         sorted.sort((a, b) => Number(b.rating) - Number(a.rating));
         break;
       case 'stock_desc':

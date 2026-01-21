@@ -38,7 +38,6 @@ export async function GET(
 
     const order = orders[0];
 
-    // Get order items
     const items = await query<{
       product_id: number;
       product_name: string;
@@ -75,7 +74,6 @@ export async function PATCH(
     const body = await request.json();
     const { status } = body;
 
-    // Pending orders (newly created) cannot have their status changed
     const existingOrder = await query<{ status: string }[]>(
       `SELECT status FROM Orders WHERE order_id = $1`,
       [orderId]
@@ -109,7 +107,6 @@ export async function DELETE(
   try {
     const orderId = parseInt(params.id);
 
-    // Only pending orders can be deleted
     const existingOrder = await query<{ status: string }[]>(
       `SELECT status FROM Orders WHERE order_id = $1`,
       [orderId]
@@ -123,10 +120,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Only pending orders can be deleted' }, { status: 400 });
     }
 
-    // Delete order items first (cascade should handle this, but being explicit)
     await execute(`DELETE FROM OrderItem WHERE order_id = $1`, [orderId]);
-    
-    // Delete the order
     await execute(`DELETE FROM Orders WHERE order_id = $1`, [orderId]);
 
     return NextResponse.json({ success: true, message: 'Order deleted' });

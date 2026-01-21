@@ -3,7 +3,6 @@ import { Pool } from 'pg';
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  // This will surface clearly in Vercel logs instead of failing silently.
   throw new Error('DATABASE_URL is not set');
 }
 
@@ -13,7 +12,6 @@ const isLocal =
 const pool = new Pool({
   connectionString,
   max: 10,
-  // Neon requires SSL. Locally, most people run without SSL.
   ssl: isLocal ? undefined : { rejectUnauthorized: false },
 });
 

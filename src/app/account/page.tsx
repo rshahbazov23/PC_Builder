@@ -57,7 +57,6 @@ export default function AccountPage() {
   useEffect(() => {
     if (selectedUser) {
       fetchOrders(selectedUser.user_id);
-      // Store selected user in localStorage for other pages
       localStorage.setItem('selectedUserId', selectedUser.user_id.toString());
     }
   }, [selectedUser]);
@@ -67,7 +66,6 @@ export default function AccountPage() {
       const res = await fetch('/api/users');
       const data = await res.json();
       setUsers(data);
-      // Try to restore previously selected user
       const savedUserId = localStorage.getItem('selectedUserId');
       if (savedUserId) {
         const user = data.find((u: User) => u.user_id === parseInt(savedUserId));

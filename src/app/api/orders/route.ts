@@ -45,7 +45,6 @@ export async function GET(request: Request) {
 
     const orders = await query<OrderWithItems[]>(sql, params);
 
-    // Fetch items for each order
     for (const order of orders) {
       const items = await query<OrderWithItems['items'][0][]>(`
         SELECT 
@@ -76,7 +75,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'userId and buildId are required' }, { status: 400 });
     }
 
-    // Get build items with prices
     const buildItems = await query<{ product_id: number; price: number }[]>(`
       SELECT bi.product_id, p.price
       FROM BuildItem bi
@@ -88,10 +86,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Build has no items' }, { status: 400 });
     }
 
-    // Calculate total price
     const totalPrice = buildItems.reduce((sum, item) => sum + Number(item.price), 0);
 
-    // Create order
     const orderResult = await queryOne<{ order_id: number }>(
       `INSERT INTO Orders (user_id, total_price, status, shipping_address) 
        VALUES ($1, $2, 'pending', $3) RETURNING order_id`,
@@ -104,7 +100,6 @@ export async function POST(request: Request) {
 
     const orderId = orderResult.order_id;
 
-    // Create order items
     for (const item of buildItems) {
       await execute(
         `INSERT INTO OrderItem (order_id, product_id, quantity, unit_price) 

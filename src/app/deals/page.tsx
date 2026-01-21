@@ -107,7 +107,6 @@ async function getDeals(filters: PageProps['searchParams']) {
     params.push(parseFloat(minDiscount));
   }
 
-  // Sorting
   switch (filters.sort) {
     case 'discount_desc':
       sql += ' ORDER BY savings_percentage DESC, p.rating DESC';
@@ -132,7 +131,6 @@ async function getDeals(filters: PageProps['searchParams']) {
       break;
   }
 
-  // Limit
   const limit = Math.min(Math.max(parseInt(filters.limit || '50', 10) || 50, 1), 200);
   sql += ` LIMIT $${paramIndex++}`;
   params.push(limit);
@@ -178,7 +176,6 @@ export default async function DealsPage({ searchParams }: PageProps) {
     getDealCategories(),
   ]);
 
-  // Stats
   const maxDiscount = deals.length > 0 ? Math.max(...deals.map(d => d.savings_percentage)) : 0;
   const maxSavings = deals.length > 0 ? Math.max(...deals.map(d => d.savings_amount)) : 0;
   const avgDiscount = deals.length > 0 ? deals.reduce((sum, d) => sum + d.savings_percentage, 0) / deals.length : 0;

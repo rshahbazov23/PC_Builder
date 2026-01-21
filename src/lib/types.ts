@@ -1,7 +1,3 @@
-/**
- * TypeScript types matching our database schema
- */
-
 export interface Category {
   category_id: number;
   name: string;
@@ -23,7 +19,6 @@ export interface Product {
   image_url: string | null;
   description: string | null;
   created_at: Date;
-  // Joined fields
   category_name?: string;
   category_slug?: string;
 }
@@ -52,11 +47,9 @@ export interface BuildItem {
   product_id: number;
   slot_type: SlotType;
   added_at: Date;
-  // Joined fields
   product?: Product;
 }
 
-// Spec types
 export interface CPUSpec {
   product_id: number;
   socket: string;
@@ -120,12 +113,10 @@ export interface StorageSpec {
   write_speed_mbps: number;
 }
 
-// Extended product types with specs
 export interface ProductWithSpecs extends Product {
   specs?: CPUSpec | MOBOSpec | GPUSpec | CASESpec | PSUSpec | RAMSpec | StorageSpec;
 }
 
-// Build summary
 export interface BuildSummary {
   build_id: number;
   build_name: string;
@@ -151,7 +142,6 @@ export interface BuildItemWithProduct extends BuildItem {
   specs?: CPUSpec | MOBOSpec | GPUSpec | CASESpec | PSUSpec | RAMSpec | StorageSpec;
 }
 
-// API response types
 export interface ProductFilters {
   category?: string;
   brand?: string;

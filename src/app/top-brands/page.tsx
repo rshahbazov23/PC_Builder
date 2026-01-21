@@ -43,7 +43,6 @@ async function getTopBrands() {
 export default async function TopBrandsPage() {
   const topBrands = await getTopBrands();
 
-  // Group by category
   const brandsByCategory = topBrands.reduce((acc, brand) => {
     if (!acc[brand.category_name]) acc[brand.category_name] = [];
     acc[brand.category_name].push(brand);

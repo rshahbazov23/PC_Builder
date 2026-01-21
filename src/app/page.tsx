@@ -5,7 +5,6 @@ import { Category, Product } from '@/lib/types';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 
-// Ensure this page always reflects live DB data (important when you insert rows manually in Neon)
 export const dynamic = 'force-dynamic';
 
 async function getCategories() {

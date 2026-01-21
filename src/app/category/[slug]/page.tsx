@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 
-// Ensure category pages reflect live DB updates (manual inserts in Neon)
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
@@ -58,7 +57,6 @@ async function getProducts(slug: string, filters: CategoryFilters) {
     JOIN Category c ON p.category_id = c.category_id
   `;
 
-  // Category-specific spec joins (only for the current category page)
   if (slug === 'cpu') sql += ` LEFT JOIN CPU_Spec cpu ON cpu.product_id = p.product_id`;
   if (slug === 'motherboard') sql += ` LEFT JOIN MOBO_Spec mobo ON mobo.product_id = p.product_id`;
   if (slug === 'gpu') sql += ` LEFT JOIN GPU_Spec gpu ON gpu.product_id = p.product_id`;
@@ -118,7 +116,6 @@ async function getProducts(slug: string, filters: CategoryFilters) {
     sql += ' AND p.stock_qty > 0';
   }
 
-  // Category-specific filters
   if ((slug === 'cpu' || slug === 'motherboard') && socket) {
     const col = slug === 'cpu' ? 'cpu.socket' : 'mobo.socket';
     sql += ` AND ${col} = $${paramIndex++}`;
@@ -152,7 +149,6 @@ async function getProducts(slug: string, filters: CategoryFilters) {
     params.push(formFactor);
   }
 
-  // Sorting (safe mapping)
   switch (filters.sort) {
     case 'price_asc':
       sql += ' ORDER BY p.price ASC, p.rating DESC, p.name ASC';
@@ -175,7 +171,6 @@ async function getProducts(slug: string, filters: CategoryFilters) {
       break;
   }
 
-  // Limit
   const limit = Math.min(Math.max(parseInt(filters.limit || '60', 10) || 60, 1), 200);
   sql += ` LIMIT $${paramIndex++}`;
   params.push(limit);
@@ -195,7 +190,6 @@ async function getBrands(slug: string) {
 }
 
 async function getFilterOptions(slug: string): Promise<FilterOptions> {
-  // Returns per-category options needed to render "amplified" filters.
   if (slug === 'cpu') {
     const sockets = await query<{ value: string }[]>(
       `

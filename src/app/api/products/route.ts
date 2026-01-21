@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
     const limitRaw = searchParams.get('limit');
     const offsetRaw = searchParams.get('offset');
 
-    // Category-specific spec joins (only when category is specified)
     let specJoin = '';
     if (category === 'cpu') specJoin = ' LEFT JOIN CPU_Spec cpu ON cpu.product_id = p.product_id';
     if (category === 'motherboard') specJoin = ' LEFT JOIN MOBO_Spec mobo ON mobo.product_id = p.product_id';
@@ -80,7 +79,6 @@ export async function GET(request: NextRequest) {
       params.push(parseFloat(minRating));
     }
 
-    // Category-specific filters (same as browse)
     if (socket && category === 'cpu') {
       sql += ` AND cpu.socket = $${paramIndex++}`;
       params.push(socket);
@@ -105,7 +103,6 @@ export async function GET(request: NextRequest) {
       sql += ` AND cs.supported_form_factor = $${paramIndex++}`;
       params.push(formFactor);
     }
-    // (Bonus) form factor filter for motherboards
     if (formFactor && category === 'motherboard') {
       sql += ` AND mobo.form_factor = $${paramIndex++}`;
       params.push(formFactor);
@@ -129,7 +126,6 @@ export async function GET(request: NextRequest) {
       sql += ' AND p.stock_qty > 0';
     }
 
-    // Safe sort mapping (avoid injecting arbitrary ORDER BY)
     switch (sort) {
       case 'price_asc':
         sql += ' ORDER BY p.price ASC, p.rating DESC, p.name ASC';

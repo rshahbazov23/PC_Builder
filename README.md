@@ -20,34 +20,17 @@ A "mini-Newegg" PC parts store and PC Builder application built for COMP306 Data
 
 - **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
 - **Backend**: Next.js API Routes
-- **Database**: PostgreSQL 14+
+- **Database**: Neon Postgres (`neondb`)
 - **Driver**: pg (raw SQL with parameterized queries)
-
-## Project Structure
-
-```
-├── db/
-│   ├── schema.sql      # Database schema (CREATE TABLE statements)
-│   └── seed.sql        # Sample data (180+ products)
-├── docs/
-│   ├── er-diagram.mmd  # Mermaid ER diagram
-│   └── advanced-queries.md  # Documentation of 5 advanced SQL queries
-├── src/
-│   ├── app/
-│   │   ├── api/        # API routes
-│   │   ├── builder/    # PC Builder pages
-│   │   ├── category/   # Category pages
-│   │   ├── deals/      # Deals page
-│   │   ├── product/    # Product detail pages
-│   │   └── top-brands/ # Top Brands page
-│   ├── components/     # Reusable UI components
-│   └── lib/
-│       ├── db.ts       # Database connection pool
-│       └── types.ts    # TypeScript type definitions
-└── env.example         # Environment variables template
-```
+- **Deployment**: Vercel
+- **Language**: Mostly TypeScript (with a few JS config files)
 
 ## Setup Instructions
+
+You can either use the deployed website or run it locally:
+
+- **Deployed (Vercel)**: [pc-builder-two-sigma.vercel.app](https://pc-builder-two-sigma.vercel.app/)
+- **Local setup**: Follow the steps below.
 
 ### Prerequisites
 
@@ -98,46 +81,6 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Database Schema
-
-### Tables (14 total; 12 core + 2 order tables)
-
-1. **Category** - Product categories
-2. **User** - User accounts
-3. **Product** - Main product information
-4. **Build** - User PC builds
-5. **BuildItem** - Parts in a build (with unique slot constraint)
-6. **CPU_Spec** - CPU-specific specifications
-7. **MOBO_Spec** - Motherboard specifications
-8. **GPU_Spec** - Graphics card specifications
-9. **RAM_Spec** - Memory specifications
-10. **PSU_Spec** - Power supply specifications
-11. **CASE_Spec** - Case specifications
-12. **Storage_Spec** - SSD/HDD specifications
-13. **Orders** - Customer orders
-14. **OrderItem** - Order line items
-
-### Key Relationships
-
-- Category 1:N Product
-- Product 1:0..1 Spec tables (depending on category)
-- User 1:N Build
-- Build 1:N BuildItem (with UNIQUE constraint on build_id + slot_type)
-
-## Advanced SQL Queries (5 Required)
-
-All 5 advanced queries are integrated into the UI:
-
-| Query | Type | UI Location |
-|-------|------|-------------|
-| **Q1**: Compatible Motherboards | Nested Subquery + JOIN | Builder → Compatible Motherboards |
-| **Q2**: Compatible Cases | Multiple Nested Subqueries | Builder → Compatible Cases |
-| **Q3**: PSU Recommendation | Aggregate (SUM) + Derived Calculation | Builder → Recommend PSU |
-| **Q4**: Deals | Correlated Subquery with AVG | Deals page |
-| **Q5**: Top Brands | GROUP BY + HAVING | Top Brands page |
-
-See `docs/advanced-queries.md` for detailed SQL and explanations.
-
 ## API Endpoints
 
 ### Products & Categories
@@ -160,20 +103,6 @@ See `docs/advanced-queries.md` for detailed SQL and explanations.
 - `GET /api/builds/[id]/recommend/psu` - Query 3
 - `GET /api/deals` - Query 4
 - `GET /api/top-brands` - Query 5
-
-## Sample Data
-
-The seed file includes:
-- 7 categories
-- 25+ CPUs (Intel LGA1700, AMD AM5, AMD AM4)
-- 25+ Motherboards (matching sockets)
-- 27+ GPUs (NVIDIA RTX 40 series, AMD RX 7000)
-- 22+ RAM kits (DDR4 and DDR5)
-- 28+ PSUs (550W to 1500W)
-- 23+ Cases (ATX, Micro-ATX, Mini-ITX)
-- 32+ Storage devices (NVMe, SATA SSD, HDD)
-- 3 demo builds
-- 3 demo orders (21 order items)
 
 ## License
 

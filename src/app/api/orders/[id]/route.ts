@@ -75,6 +75,16 @@ export async function PATCH(
     const body = await request.json();
     const { status } = body;
 
+    // Pending orders (newly created) cannot have their status changed
+    const existingOrder = await query<{ status: string }[]>(
+      `SELECT status FROM Orders WHERE order_id = $1`,
+      [orderId]
+    );
+    
+    if (existingOrder.length > 0 && existingOrder[0].status === 'pending') {
+      return NextResponse.json({ error: 'Pending orders cannot have their status changed' }, { status: 400 });
+    }
+
     const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
@@ -89,5 +99,39 @@ export async function PATCH(
   } catch (error) {
     console.error('Error updating order:', error);
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const orderId = parseInt(params.id);
+
+    // Only pending orders can be deleted
+    const existingOrder = await query<{ status: string }[]>(
+      `SELECT status FROM Orders WHERE order_id = $1`,
+      [orderId]
+    );
+
+    if (existingOrder.length === 0) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    if (existingOrder[0].status !== 'pending') {
+      return NextResponse.json({ error: 'Only pending orders can be deleted' }, { status: 400 });
+    }
+
+    // Delete order items first (cascade should handle this, but being explicit)
+    await execute(`DELETE FROM OrderItem WHERE order_id = $1`, [orderId]);
+    
+    // Delete the order
+    await execute(`DELETE FROM Orders WHERE order_id = $1`, [orderId]);
+
+    return NextResponse.json({ success: true, message: 'Order deleted' });
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 });
   }
 }

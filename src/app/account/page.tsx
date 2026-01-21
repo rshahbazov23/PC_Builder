@@ -110,6 +110,27 @@ export default function AccountPage() {
     }
   }
 
+  async function deleteOrder(orderId: number) {
+    if (!confirm('Are you sure you want to delete this order?')) return;
+    
+    setUpdatingOrder(orderId);
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok && selectedUser) {
+        fetchOrders(selectedUser.user_id);
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete order');
+      }
+    } catch (error) {
+      console.error('Error deleting order:', error);
+    } finally {
+      setUpdatingOrder(null);
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -256,22 +277,39 @@ export default function AccountPage() {
                       </div>
                     </div>
 
-                    {/* Status Update (Demo) */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs text-muted-foreground font-mono">update_status:</span>
-                      {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+                    {/* Order Actions */}
+                    {order.status === 'pending' ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground font-mono">
+                          status: pending (awaiting processing)
+                        </span>
                         <Button
-                          key={status}
-                          variant={order.status === status ? 'default' : 'outline'}
+                          variant="outline"
                           size="sm"
-                          className="text-xs h-7"
+                          className="text-xs h-7 text-red-600 border-red-200 hover:bg-red-50"
                           disabled={updatingOrder === order.order_id}
-                          onClick={() => updateOrderStatus(order.order_id, status)}
+                          onClick={() => deleteOrder(order.order_id)}
                         >
-                          {status}
+                          {updatingOrder === order.order_id ? 'deleting...' : 'delete_order()'}
                         </Button>
-                      ))}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs text-muted-foreground font-mono">update_status:</span>
+                        {['processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+                          <Button
+                            key={status}
+                            variant={order.status === status ? 'default' : 'outline'}
+                            size="sm"
+                            className="text-xs h-7"
+                            disabled={updatingOrder === order.order_id}
+                            onClick={() => updateOrderStatus(order.order_id, status)}
+                          >
+                            {status}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
                   </Card>
                 ))}
               </div>

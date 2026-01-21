@@ -20,66 +20,119 @@ A "mini-Newegg" PC parts store and PC Builder application built for COMP306 Data
 
 - **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
 - **Backend**: Next.js API Routes
-- **Database**: Neon Postgres (`neondb`)
+- **Database**: PostgreSQL (production: Neon Postgres `neondb`)
 - **Driver**: pg (raw SQL with parameterized queries)
 - **Deployment**: Vercel
 - **Language**: Mostly TypeScript (with a few JS config files)
 
 ## Setup Instructions
 
-You can either use the deployed website or run it locally:
+You can either use the deployed website or run it locally.
 
-- **Deployed (Vercel)**: [pc-builder-two-sigma.vercel.app](https://pc-builder-two-sigma.vercel.app/)
-- **Local setup**: Follow the steps below.
+### Option A) Use the deployed website (recommended for grading)
+- **Live URL (Vercel)**: [pc-builder-two-sigma.vercel.app](https://pc-builder-two-sigma.vercel.app/)
 
-### Prerequisites
+### Option B) Run locally (full guide)
 
-- Node.js 18+ installed
-- PostgreSQL 14+ installed and running
-- A PostgreSQL user with database creation privileges
+#### 0) Install prerequisites
+- **Git** (to clone the repository)
+- **Node.js 18+** ([download](https://nodejs.org/en/download))
+- **PostgreSQL 14+** ([download](https://www.postgresql.org/download/))
 
-### 1. Clone and Install Dependencies
+Verify installs:
 
 ```bash
-cd COMP306_project
+node -v
+npm -v
+psql --version
+```
+
+##### macOS (Homebrew)
+
+```bash
+brew install nvm postgresql@14
+brew services start postgresql@14
+```
+
+Then install Node 18 using nvm:
+
+```bash
+nvm install 18
+nvm use 18
+```
+
+##### Windows
+- Install **Node.js 18+** from the Node.js link above.
+- Install **PostgreSQL 14+** from the PostgreSQL link above (set a password for the `postgres` user during installation).
+- Use **PowerShell** (or Git Bash) to run the commands below.
+
+##### Linux (Ubuntu/Debian)
+
+```bash
+sudo apt update
+sudo apt install -y postgresql postgresql-contrib
+sudo systemctl enable --now postgresql
+```
+
+#### 1) Clone the repository + install dependencies
+
+```bash
+git clone <REPO_URL>
+cd COMP306_Project
 npm install
 ```
 
-### 2. Configure Environment Variables
+#### 2) Configure environment variables
 
-Copy the example environment file and edit it with your PostgreSQL credentials:
+Create the local env file:
 
 ```bash
 cp env.example .env.local
 ```
 
-Edit `.env.local`:
-```
+Edit `.env.local` and set your local Postgres connection:
+
+```txt
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/neondb
 ```
 
-### 3. Set Up the Database
+Notes:
+- If your local Postgres user is not `postgres`, replace it.
+- If you don’t use a password locally, you can omit it:
+  `postgresql://postgres@localhost:5432/neondb`
 
-Run the schema and seed files in PostgreSQL:
+#### 3) Create and seed the database
+
+This project’s schema file **creates the `neondb` database** and connects to it (it uses `psql` commands like `\\c`), so please run it via `psql`.
+
+**Option 1 (recommended):**
+
+```bash
+npm run db:setup
+```
+
+**Option 2 (manual):**
 
 ```bash
 psql -U postgres -f db/schema.sql
 psql -U postgres -d neondb -f db/seed.sql
 ```
 
-Or use the npm script:
+If you get permission errors, run these commands with a Postgres user that has database creation privileges (or create the DB manually).
 
-```bash
-npm run db:setup
-```
-
-### 4. Start the Development Server
+#### 4) Run the app
 
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser.
+Open:
+- `http://localhost:3000`
+
+#### Troubleshooting
+- **“DATABASE_URL is not set”**: make sure `.env.local` exists and contains `DATABASE_URL=...`
+- **psql cannot connect**: ensure PostgreSQL is running, and the username/password are correct
+- **permission denied creating database**: use a superuser (often `postgres`) or a user with CREATEDB privileges
 
 ## API Endpoints
 

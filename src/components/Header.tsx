@@ -30,6 +30,8 @@ export function Header() {
             <NavLink href="/deals" active={isActive('/deals')}>deals</NavLink>
             <span className="text-muted-foreground/50">/</span>
             <NavLink href="/top-brands" active={isActive('/top-brands')}>brands</NavLink>
+            <span className="text-muted-foreground/50">/</span>
+            <NavLink href="/account" active={isActive('/account')}>account</NavLink>
           </nav>
 
           {/* CTA */}

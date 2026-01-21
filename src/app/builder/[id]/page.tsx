@@ -141,6 +141,8 @@ export default function BuildPage() {
   const [draftName, setDraftName] = useState('');
   const [draftDescription, setDraftDescription] = useState('');
   const [savingBuild, setSavingBuild] = useState(false);
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState<number | null>(null);
 
   const updateFilters = useCallback((slotType: SlotType, patch: Partial<SlotFilters>) => {
     setFilters(prev => {
@@ -341,6 +343,35 @@ export default function BuildPage() {
       setSavingBuild(false);
     }
   }, [buildId, draftDescription, draftName, router]);
+
+  const placeOrder = useCallback(async () => {
+    if (!build || build.items.length === 0) return;
+    
+    setPlacingOrder(true);
+    try {
+      // Get user ID from localStorage or default to 1
+      const userId = parseInt(localStorage.getItem('selectedUserId') || '1', 10);
+      
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          buildId,
+          shippingAddress: 'Demo Address - Koc University, Istanbul',
+        }),
+      });
+      
+      if (!res.ok) throw new Error('Failed to place order');
+      const data = await res.json();
+      setOrderSuccess(data.orderId);
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('Failed to place order. Please try again.');
+    } finally {
+      setPlacingOrder(false);
+    }
+  }, [build, buildId]);
 
   const currentSlot = activeStep === 'SUMMARY' ? null : (activeStep as SlotType);
   const currentMode = currentSlot ? (viewMode[currentSlot] ?? 'all') : 'all';
@@ -589,14 +620,36 @@ export default function BuildPage() {
                             <span className="text-muted-foreground ml-4">min_psu:</span> {Math.ceil(build.total_watts * 1.2)}W+
                           </div>
 
-                <Button
-                            onClick={saveBuildAndExit}
-                            disabled={savingBuild}
-                            className="font-mono"
-                          >
-                            {savingBuild ? 'saving...' : 'save_and_exit()'}
-                </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={saveBuildAndExit}
+                              disabled={savingBuild}
+                              variant="outline"
+                              className="font-mono"
+                            >
+                              {savingBuild ? 'saving...' : 'save_and_exit()'}
+                            </Button>
+                            <Button
+                              onClick={placeOrder}
+                              disabled={placingOrder || partsFilled === 0}
+                              className="font-mono"
+                            >
+                              {placingOrder ? 'ordering...' : 'place_order()'}
+                            </Button>
+                          </div>
                         </div>
+
+                        {orderSuccess && (
+                          <div className="mt-4 p-4 bg-green-50 border border-green-200 text-green-800">
+                            <div className="font-semibold mb-1">Order placed successfully!</div>
+                            <div className="text-sm font-mono">
+                              order_id: {orderSuccess}
+                            </div>
+                            <Link href="/account" className="text-sm underline mt-2 inline-block">
+                              View order history →
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     );
                   }

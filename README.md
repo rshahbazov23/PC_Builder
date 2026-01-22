@@ -1,10 +1,10 @@
 # PC Builder Store
 
-A "mini-Newegg" PC parts store and PC Builder application built for COMP306 Database Management Systems course project.
+A "mini-Newegg" PC parts store and PC Builder application built for COMP306 DatKoçse Management Systems course project.
 
 ## Features
 
-- **Browse Products**: View PC components by category (CPU, GPU, Motherboard, RAM, PSU, Case, Storage)
+- **Browse Products**: View PC components by category (CPU, GPU, Motherboard, RAM, PSU, Case, Storage, CPU Cooler, Monitor, Keyboard, Mouse, Headset)
 - **Product Details**: See detailed specifications for each component
 - **PC Builder**: Create custom PC builds with compatibility checking
 - **Compatibility System**:
@@ -78,7 +78,7 @@ sudo systemctl enable --now postgresql
 
 ```bash
 git clone https://github.com/rshahbazov23/PC_Builder.git
-cd COMP306_Project
+cd PC_Builder
 npm install
 ```
 
@@ -109,6 +109,7 @@ This project’s schema file **creates the `neondb` database** and connects to i
 
 ```bash
 npm run db:setup
+psql -U postgres -d neondb -f db/migration_add_product_images.sql
 ```
 
 **Option 2 (manual):**
@@ -116,7 +117,10 @@ npm run db:setup
 ```bash
 psql -U postgres -f db/schema.sql
 psql -U postgres -d neondb -f db/seed_combined.sql
+psql -U postgres -d neondb -f db/migration_add_product_images.sql
 ```
+
+**Note**: The image migration (`migration_add_product_images.sql`) adds image URLs to all 307 products. This step is required for images to display correctly in the application.
 
 If you get permission errors, run these commands with a Postgres user that has database creation privileges (or create the DB manually).
 
@@ -130,9 +134,14 @@ Open:
 - `http://localhost:3000`
 
 #### Troubleshooting
-- **“DATABASE_URL is not set”**: make sure `.env.local` exists and contains `DATABASE_URL=...`
+- **"DATABASE_URL is not set"**: make sure `.env.local` exists and contains `DATABASE_URL=...`
 - **psql cannot connect**: ensure PostgreSQL is running, and the username/password are correct
 - **permission denied creating database**: use a superuser (often `postgres`) or a user with CREATEDB privileges
+- **"role 'postgres' does not exist"** (macOS): On macOS with Homebrew PostgreSQL, the default user is your system username, not `postgres`. Either:
+  - Create the postgres role: `psql -d postgres -c "CREATE ROLE postgres WITH SUPERUSER LOGIN PASSWORD 'your_password';"`
+  - Or update `.env.local` to use your system username instead of `postgres`
+- **Images not showing**: Make sure you've run the image migration: `psql -U postgres -d neondb -f db/migration_add_product_images.sql`
+- **PostgreSQL not running** (macOS): Start it with `brew services start postgresql@14`
 
 ## API Endpoints
 
@@ -148,6 +157,17 @@ Open:
 - `DELETE /api/builds/[id]` - Delete a build
 - `POST /api/builds/[id]/items` - Add part to build
 - `DELETE /api/builds/[id]/items?slot_type=CPU` - Remove part from build
+
+### Orders
+- `GET /api/orders?userId=1` - List orders (optionally filtered by user)
+- `POST /api/orders` - Create new order from a build
+- `GET /api/orders/[id]` - Get order details with items
+- `PATCH /api/orders/[id]` - Update order status (cannot update pending orders)
+- `DELETE /api/orders/[id]` - Delete order (only pending orders can be deleted)
+
+### Other
+- `GET /api/users` - List all users with build/order counts
+- `GET /api/health` - Health check endpoint (returns DB status and counts)
 
 ### Advanced Query Endpoints
 - `GET /api/builds/[id]/compatible/motherboards` - Query 1

@@ -1,80 +1,47 @@
 # PC Builder Store
 
-A "mini-Newegg" PC parts store and PC Builder application built for COMP306 DatKoçse Management Systems course project.
+A PC parts store with a build configurator that checks whether the chosen components fit together. It was the course project for Database Management Systems (COMP 306) at Koç University.
+
+The store lists 307 products in 12 categories. In the builder you pick a part for each slot, and the app checks every choice against what is already in the build.
 
 ## Features
 
-- **Browse Products**: View PC components by category (CPU, GPU, Motherboard, RAM, PSU, Case, Storage, CPU Cooler, Monitor, Keyboard, Mouse, Headset)
-- **Product Details**: See detailed specifications for each component
-- **PC Builder**: Create custom PC builds with compatibility checking
-- **Compatibility System**:
-  - CPU ↔ Motherboard socket matching
-  - RAM ↔ Motherboard DDR type matching
-  - GPU length ↔ Case clearance checking
-  - Motherboard form factor ↔ Case compatibility
-  - PSU wattage recommendations based on build power consumption
-- **Deals Page**: Find products priced below their category average
-- **Top Brands**: Discover highly-rated brands with good product variety
+- **Catalog.** Browse products by category, filter by brand and price, and open a product to see its full specifications.
+- **PC builder.** Create a build, add or remove a part for each slot, and turn a finished build into an order.
+- **Compatibility checks**, each computed in SQL from the build's current parts:
+  - CPU socket against motherboard socket
+  - memory type (DDR generation) against the motherboard
+  - graphics card length against case clearance
+  - motherboard form factor against the case
+  - power supplies with at least 1.2 times the build's total power draw
+- **Deals.** Products priced below the average of their category, ranked by how far below.
+- **Top brands.** For each category, brands with enough products in stock and a high average rating.
 
-## Tech Stack
+## How it is built
 
-- **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: PostgreSQL (production: Neon Postgres `neondb`)
-- **Driver**: pg (raw SQL with parameterized queries)
-- **Deployment**: Vercel
-- **Language**: Mostly TypeScript (with a few JS config files)
+| Layer | Choice |
+|---|---|
+| Front end | Next.js 14 (App Router), TypeScript, Tailwind CSS |
+| Back end | Next.js API routes |
+| Database | PostgreSQL, queried with hand-written parameterized SQL through `pg`, with no ORM |
 
-## Setup Instructions
+The schema in [db/schema.sql](db/schema.sql) has 14 tables: categories and products, one specification table for each component type (CPU, motherboard, graphics card, case, power supply, memory, storage), builds and their items, orders and their items, and users. It uses enum types for build slots and order status, indexes on product category, brand and price, and a trigger that updates a build's timestamp.
 
-You can either use the deployed website or run it locally.
+The project's five advanced queries each sit behind their own endpoint:
 
-### Option A) Use the deployed website (recommended for grading)
-- **Live URL (Vercel)**: [pc-builder-two-sigma.vercel.app](https://pc-builder-two-sigma.vercel.app/)
+| Endpoint | Query |
+|---|---|
+| `GET /api/builds/[id]/compatible/motherboards` | Motherboards whose socket matches the build's CPU |
+| `GET /api/builds/[id]/compatible/cases` | Cases that fit the build's motherboard and graphics card |
+| `GET /api/builds/[id]/recommend/psu` | Power supplies with enough wattage, using an aggregate over the build's parts in a nested subquery |
+| `GET /api/deals` | Products below their category's average price, using correlated subqueries |
+| `GET /api/top-brands` | Brands per category, using `GROUP BY` and `HAVING` on product count and average rating |
 
-### Option B) Run locally (full guide)
+## Running it locally
 
-#### 0) Install prerequisites
-- **Git** (to clone the repository)
-- **Node.js 18+** ([download](https://nodejs.org/en/download))
-- **PostgreSQL 14+** ([download](https://www.postgresql.org/download/))
+You need Git, Node.js 18 or later, and PostgreSQL 14 or later.
 
-Verify installs:
-
-```bash
-node -v
-npm -v
-psql --version
-```
-
-##### macOS (Homebrew)
-
-```bash
-brew install nvm postgresql@14
-brew services start postgresql@14
-```
-
-Then install Node 18 using nvm:
-
-```bash
-nvm install 18
-nvm use 18
-```
-
-##### Windows
-- Install **Node.js 18+** from the Node.js link above.
-- Install **PostgreSQL 14+** from the PostgreSQL link above (set a password for the `postgres` user during installation).
-- Use **PowerShell** (or Git Bash) to run the commands below.
-
-##### Linux (Ubuntu/Debian)
-
-```bash
-sudo apt update
-sudo apt install -y postgresql postgresql-contrib
-sudo systemctl enable --now postgresql
-```
-
-#### 1) Clone the repository + install dependencies
+### 1. Clone and install
 
 ```bash
 git clone https://github.com/rshahbazov23/PC_Builder.git
@@ -82,37 +49,23 @@ cd PC_Builder
 npm install
 ```
 
-#### 2) Configure environment variables
-
-Create the local env file:
+### 2. Set the database connection
 
 ```bash
 cp env.example .env.local
 ```
 
-Edit `.env.local` and set your local Postgres connection:
+Edit `.env.local` so that `DATABASE_URL` points at your local PostgreSQL:
 
 ```txt
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/neondb
 ```
 
-Notes:
-- If your local Postgres user is not `postgres`, replace it.
-- If you don’t use a password locally, you can omit it:
-  `postgresql://postgres@localhost:5432/neondb`
+Replace `postgres` if your local user has another name, and leave out the password if you don't use one.
 
-#### 3) Create and seed the database
+### 3. Create and seed the database
 
-This project’s schema file **creates the `neondb` database** and connects to it (it uses `psql` commands like `\\c`), so please run it via `psql`.
-
-**Option 1 (recommended):**
-
-```bash
-npm run db:setup
-psql -U postgres -d neondb -f db/migration_add_product_images.sql
-```
-
-**Option 2 (manual):**
+The schema file creates a database called `neondb` and connects to it, so run it through `psql`:
 
 ```bash
 psql -U postgres -f db/schema.sql
@@ -120,63 +73,51 @@ psql -U postgres -d neondb -f db/seed_combined.sql
 psql -U postgres -d neondb -f db/migration_add_product_images.sql
 ```
 
-**Note**: The image migration (`migration_add_product_images.sql`) adds image URLs to all 307 products. This step is required for images to display correctly in the application.
+`npm run db:setup` runs the first two commands for you. The third adds the image URLs for all 307 products, and the product images do not show without it.
 
-If you get permission errors, run these commands with a Postgres user that has database creation privileges (or create the DB manually).
-
-#### 4) Run the app
+### 4. Start the app
 
 ```bash
 npm run dev
 ```
 
-Open:
-- `http://localhost:3000`
+Then open http://localhost:3000.
 
-#### Troubleshooting
-- **"DATABASE_URL is not set"**: make sure `.env.local` exists and contains `DATABASE_URL=...`
-- **psql cannot connect**: ensure PostgreSQL is running, and the username/password are correct
-- **permission denied creating database**: use a superuser (often `postgres`) or a user with CREATEDB privileges
-- **"role 'postgres' does not exist"** (macOS): On macOS with Homebrew PostgreSQL, the default user is your system username, not `postgres`. Either:
-  - Create the postgres role: `psql -d postgres -c "CREATE ROLE postgres WITH SUPERUSER LOGIN PASSWORD 'your_password';"`
-  - Or update `.env.local` to use your system username instead of `postgres`
-- **Images not showing**: Make sure you've run the image migration: `psql -U postgres -d neondb -f db/migration_add_product_images.sql`
-- **PostgreSQL not running** (macOS): Start it with `brew services start postgresql@14`
+### Troubleshooting
 
-## API Endpoints
+- **"DATABASE_URL is not set"**: check that `.env.local` exists and contains `DATABASE_URL=...`.
+- **`psql` cannot connect**: check that PostgreSQL is running and that the user name and password are right. On macOS with Homebrew, start it with `brew services start postgresql@14`.
+- **Permission denied creating the database**: use a superuser, often `postgres`, or a user with the `CREATEDB` privilege.
+- **"role 'postgres' does not exist"**: with Homebrew PostgreSQL on macOS the default user is your system user name. Either use that name in `.env.local` and in the `psql` commands, or create the role with `psql -d postgres -c "CREATE ROLE postgres WITH SUPERUSER LOGIN PASSWORD 'your_password';"`.
+- **Images not showing**: run the image migration from step 3.
 
-### Products & Categories
-- `GET /api/categories` - List all categories
-- `GET /api/products?category=cpu&brand=Intel&minPrice=100&maxPrice=500` - List products with filters
-- `GET /api/products/[id]` - Get product details with specs
+## API
+
+### Products and categories
+
+- `GET /api/categories` lists all categories.
+- `GET /api/products?category=cpu&brand=Intel&minPrice=100&maxPrice=500` lists products with filters.
+- `GET /api/products/[id]` returns one product with its specifications.
 
 ### Builds
-- `GET /api/builds` - List user's builds
-- `POST /api/builds` - Create new build
-- `GET /api/builds/[id]` - Get build details
-- `DELETE /api/builds/[id]` - Delete a build
-- `POST /api/builds/[id]/items` - Add part to build
-- `DELETE /api/builds/[id]/items?slot_type=CPU` - Remove part from build
+
+- `GET /api/builds` lists builds.
+- `POST /api/builds` creates a build.
+- `GET /api/builds/[id]` returns one build.
+- `DELETE /api/builds/[id]` deletes a build.
+- `POST /api/builds/[id]/items` adds a part to a build.
+- `DELETE /api/builds/[id]/items?slot_type=CPU` removes a part from a build.
+- `GET /api/builds/[id]/compatible/ram` lists memory that matches the build's motherboard.
 
 ### Orders
-- `GET /api/orders?userId=1` - List orders (optionally filtered by user)
-- `POST /api/orders` - Create new order from a build
-- `GET /api/orders/[id]` - Get order details with items
-- `PATCH /api/orders/[id]` - Update order status (cannot update pending orders)
-- `DELETE /api/orders/[id]` - Delete order (only pending orders can be deleted)
+
+- `GET /api/orders?userId=1` lists orders, optionally for one user.
+- `POST /api/orders` creates an order from a build.
+- `GET /api/orders/[id]` returns one order with its items.
+- `PATCH /api/orders/[id]` updates an order's status.
+- `DELETE /api/orders/[id]` deletes an order; only pending orders can be deleted.
 
 ### Other
-- `GET /api/users` - List all users with build/order counts
-- `GET /api/health` - Health check endpoint (returns DB status and counts)
 
-### Advanced Query Endpoints
-- `GET /api/builds/[id]/compatible/motherboards` - Query 1
-- `GET /api/builds/[id]/compatible/ram` - RAM compatibility
-- `GET /api/builds/[id]/compatible/cases` - Query 2
-- `GET /api/builds/[id]/recommend/psu` - Query 3
-- `GET /api/deals` - Query 4
-- `GET /api/top-brands` - Query 5
-
-## License
-
-This project was created for educational purposes as part of COMP306 course at Koç University.
+- `GET /api/users` lists users with their build and order counts.
+- `GET /api/health` reports database status and row counts.
